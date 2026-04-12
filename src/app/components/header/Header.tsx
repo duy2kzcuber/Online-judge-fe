@@ -5,13 +5,15 @@ export const Header = () => {
 
   return (
     <>
-      <div className="flex gap-[20px] px-[30px] md:px-[15px] bg-[#FDFDFD] shadow-[0_4px_20px_rgba(0,0,0,0.06)] fixed w-full mb-[100px]">
-        <div className="text-center justify-center items-center flex text-[20px]">
-          UTTOJ
+      <header className="bg-[#FDFDFD] shadow-[0_4px_20px_rgba(0,0,0,0.06)] fixed w-full  ">
+        <div className="container md:gap-[20px] gap-[10px] flex flex-1">
+          <div className="text-center justify-center items-center flex text-[12px] md:text-[20px]">
+            UTTOJ
+          </div>
+          <HeaderMenu />
+          <HeaderAccount />
         </div>
-        <HeaderMenu />
-        <HeaderAccount/>
-      </div>
+      </header>
     </>
 
   )

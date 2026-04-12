@@ -8,7 +8,7 @@ export const HeaderAccount = () => {
       {
         !isLogin && (
           <div className="flex items-center justify-center">
-            <Link href="/login" className="border-[0.8px] rounded-[20px] px-[15px] py-[6px] hover:border-oj-orange hover:text-oj-orange">Đăng nhập</Link>
+            <Link href="/login" className="border-[0.8px] rounded-[20px] px-[15px] py-[6px] hover:border-oj-orange hover:text-oj-orange text-[12px] md:text-[16px]">Đăng nhập</Link>
           </div>
         )
       }
