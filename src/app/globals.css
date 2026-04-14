@@ -7,6 +7,8 @@
 
 @theme {
   --color-oj-orange: #FF6600;
+  --color-oj-gray: #EEEEEE;
+  --color-oj-white: #FFFFFF;
   --breakpoint-sm: 576px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 992px;

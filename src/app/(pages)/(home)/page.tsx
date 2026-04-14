@@ -1,11 +1,70 @@
-export default function Home (){
-  let html = "";
-  for(let i = 0 ; i < 10; i++){
-    html += "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec maximus nibh ipsum. Aliquam risus nunc, vestibulum molestie congue at, porttitor sit amet libero. Aenean aliquam facilisis imperdiet. Integer mattis ultrices scelerisque. Vivamus nisi arcu, accumsan id iaculis at, eleifend ac odio. Praesent euismod efficitur risus quis lacinia. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam ornare sem sit amet lectus bibendum rutrum. Ut nec molestie neque. Maecenas vitae ante eget massa faucibus facilisis. Mauris a mollis ex.Cras blandit scelerisque eleifend. Aenean vitae nulla pellentesque, consectetur lacus ut, sodales sem. Ut tincidunt ac odio in dapibus. Aenean eget dui bibendum lectus tincidunt sollicitudin. Mauris nec suscipit sem. Vivamus eget tellus orci. Fusce at sapien euismod, fermentum est in, tincidunt dui. Vivamus dignissim nunc eu elit vestibulum luctus.Cras efficitur non libero in porta. Duis vitae augue dolor. Maecenas pretium pharetra nunc eget consectetur. Curabitur orci orci, mollis gravida tincidunt in, vestibulum ut augue. Cras maximus tempor metus. Morbi bibendum ante nec tortor porta, blandit facilisis lacus egestas. Morbi ut enim ultrices sem finibus lacinia. Vivamus malesuada pharetra fringilla. Vestibulum pulvinar metus in ipsum porttitor, ut consectetur dui condimentum. Nunc tempor augue felis, nec finibus metus vehicula sit amet. Morbi mollis pellentesque risus. Proin vitae nibh mattis est blandit laoreet sit amet in nibh. Maecenas pretium sagittis risus, pulvinar tincidunt lorem. Suspendisse id imperdiet metus. Proin malesuada odio eu dolor mattis, id hendrerit est scelerisque.Sed pretium elit vitae mi accumsan congue. Phasellus auctor ante sem, maximus elementum lectus vulputate ac. Donec id est ipsum. Maecenas fermentum, quam ut tempus molestie, lacus elit porta lectus, nec posuere lectus libero et erat. Sed nisi nunc, rhoncus non tristique a, tempor at urna. Nam malesuada sit amet biam.";
-  }
-  return(
+import Link from "next/link"
+
+export default function Home() {
+  const announcementsData = [
+    {
+      "title": "各位超级管理员请勿随便修改本站配置",
+      "link": "#",
+      "createdDate": "1776094043", //dạng UNIX
+      "modifiedDate": "1776094043",
+      "userFullName": "Root"
+    },
+    {
+      "title": "各位超级管理",
+      "link": "#",
+      "createdDate": "1776094043", //dạng UNIX
+      "modifiedDate": "1776094043",
+      "userFullName": "Root"
+    },
+    {
+      "title": "各位超级管理员请勿随便修改",
+      "link": "#",
+      "createdDate": "1776094043", //dạng UNIX
+      "modifiedDate": "1776094043",
+      "userFullName": "Root"
+    },
+    {
+      "title": "各位超级管理员请勿随便修改本站配置各位超级管理员请勿随便修改本站配置",
+      "link": "#",
+      "createdDate": "1776094043", //dạng UNIX
+      "modifiedDate": "1776094043",
+      "userFullName": "Root"
+    }
+  ]
+
+  return (
     <>
-      {html};
+      <div className="container pt-[120px]">
+        <div className="bg-oj-white px-[16px] py-[14px] rounded-[5px]">
+          {/* Box header */}
+          <div className="flex justify-between">
+            <div className="text-[18px] text-center items-center justify-center">Thông báo</div>
+            <button className="bg-oj-orange px-[15px] py-[6px] text-oj-white rounded-[5px] hover:bg-[#f5965b]">Tải lại</button>
+          </div>
+          {/* Box content: display list of posts */}
+          <div className="pt-[15px]">
+            {
+              announcementsData && announcementsData.map((announcement, index) => (
+                <div className="flex justify-between my-[10px]" key={index}>
+                  <Link
+                    className="underline text-[19px] truncate w-[60%]"
+                    href={announcement.link}>
+                    {announcement.title}
+                  </Link>
+                  <div className="w-[30%] flex justify-between">
+                    <div className="">
+                      {announcement.createdDate}
+                    </div>
+                    <div className="">
+                      Bởi {announcement.userFullName}
+                    </div>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
     </>
   )
 }
