@@ -3,14 +3,14 @@ import Link from "next/link"
 export default function Home() {
   const announcementsData = [
     {
-      "title": "各位超级管理员请勿随便修改本站配置",
+      "title": "Tùng mid vcl",
       "link": "#",
       "createdDate": "1776094043", //dạng UNIX
       "modifiedDate": "1776094043",
       "userFullName": "Root"
     },
     {
-      "title": "各位超级管理",
+      "title": "Xin 500",
       "link": "#",
       "createdDate": "1776094043", //dạng UNIX
       "modifiedDate": "1776094043",
@@ -47,7 +47,7 @@ export default function Home() {
               announcementsData && announcementsData.map((announcement, index) => (
                 <div className="flex justify-between my-[10px]" key={index}>
                   <Link
-                    className="underline text-[19px] truncate w-[60%]"
+                    className="underline text-[19px] truncate w-[60%] hover:text-oj-orange"
                     href={announcement.link}>
                     {announcement.title}
                   </Link>
