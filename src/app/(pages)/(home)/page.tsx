@@ -1,3 +1,4 @@
+import { Pagination } from "@/app/components/Pagination/Pagination"
 import Link from "next/link"
 
 export default function Home() {
@@ -10,7 +11,7 @@ export default function Home() {
       "userFullName": "Root"
     },
     {
-      "title": "Xin 500",
+      "title": "XIn",
       "link": "#",
       "createdDate": "1776094043", //dạng UNIX
       "modifiedDate": "1776094043",
@@ -32,6 +33,12 @@ export default function Home() {
     }
   ]
 
+  const pagination = {
+    page: 2,
+    pageSize: 10,
+    totalPages: 36,
+    totalItems: 360
+  }
   return (
     <>
       <div className="container pt-[120px]">
@@ -64,6 +71,8 @@ export default function Home() {
             }
           </div>
         </div>
+        {/* Paginition */}
+        <Pagination pagination={pagination}/>
       </div>
     </>
   )
