@@ -39,6 +39,8 @@ export default function Home() {
     totalPages: 36,
     totalItems: 360
   }
+
+
   return (
     <>
       <div className="container pt-[120px]">
