@@ -2199,6 +2199,11 @@ json5@^2.2.3:
     object.assign "^4.1.4"
     object.values "^1.1.6"
 
+just-validate@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/just-validate/-/just-validate-4.3.0.tgz#8e3e5d78e57fd7579540591498723900a1851503"
+  integrity sha512-9yS7ZnFk95vq+O7CAa7XZEJvZN5i6jTQWNhLwOjtgkSqiLxo7GZJhK8ViylP76fXPfHLs8tYWqi81XgxPF3OGA==
+
 keyv@^4.5.4:
   version "4.5.4"
   resolved "https://registry.yarnpkg.com/keyv/-/keyv-4.5.4.tgz#a879a99e29452f942439f2a405e3af8b31d4de93"
