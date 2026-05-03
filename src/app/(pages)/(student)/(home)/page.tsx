@@ -52,7 +52,6 @@ export default function Home() {
           {/* Box header */}
           <div className="flex justify-between">
             <div className="text-[18px] text-center items-center justify-center">Thông báo</div>
-            <button className="bg-oj-orange px-[15px] py-[6px] text-oj-white rounded-[5px] hover:bg-[#f5965b]">Tải lại</button>
             <Button displayContent="tải lại" onButtonClick={handleRefresh}/>
           </div>
           {/* Box content: display list of posts */}
