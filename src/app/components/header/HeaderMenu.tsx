@@ -10,7 +10,7 @@ import { TbGridDots } from "react-icons/tb";
 export const HeaderMenu = () => {
   const navLinks = [
     { id: 1, title: "Trang chủ ", href: "/", icon: <IoMdHome /> },
-    { id: 2, title: "Bài tập", href: "/bai-tap", icon: <TbGridDots /> },
+    { id: 2, title: "Bài tập", href: "/problem", icon: <TbGridDots /> },
     { id: 3, title: "Kì thi", href: "/ki-thi", icon: <FaTrophy /> },
     { id: 4, title: "Giới thiệu", href: "/gioi-thieu", icon: <FaInfoCircle /> },
   ];

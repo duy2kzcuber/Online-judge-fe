@@ -1,3 +1,5 @@
+"use client"
+import { Button } from "@/app/components/button/Button"
 import { Pagination } from "@/app/components/Pagination/Pagination"
 import Link from "next/link"
 
@@ -39,7 +41,9 @@ export default function Home() {
     totalPages: 36,
     totalItems: 360
   }
-
+  const handleRefresh = () => {
+    console.log(36);
+  }
 
   return (
     <>
@@ -49,6 +53,7 @@ export default function Home() {
           <div className="flex justify-between">
             <div className="text-[18px] text-center items-center justify-center">Thông báo</div>
             <button className="bg-oj-orange px-[15px] py-[6px] text-oj-white rounded-[5px] hover:bg-[#f5965b]">Tải lại</button>
+            <Button displayContent="tải lại" onButtonClick={handleRefresh}/>
           </div>
           {/* Box content: display list of posts */}
           <div className="pt-[15px]">
