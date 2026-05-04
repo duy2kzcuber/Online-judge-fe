@@ -1,4 +1,7 @@
 "use client"
+
+import { Pagination } from "@/app/components/Pagination/Pagination";
+
 export const ProblemList = () => {
     const problems = [
         {
@@ -81,79 +84,74 @@ export const ProblemList = () => {
             acRate: "15.84%",
             tags: ["greedy"]
         },
-        {
-            id: 11,
-            title: "Maze Escape",
-            level: "Mid",
-            total: 452,
-            acRate: "31.20%",
-            tags: ["dfs", "graph"]
-        },
-        {
-            id: 12,
-            title: "Longest Increasing Path",
-            level: "Hard",
-            total: 678,
-            acRate: "9.12%",
-            tags: ["dp", "array"]
-        }
     ];
+    const pagination = {
+        page: 2,
+        pageSize: 10,
+        totalPages: 36,
+        totalItems: 360
+    }
     return (
-        <table className="w-full mt-4 border-collapse bg-white text-sm">
-            <thead>
-                <tr className="border-b text-left text-gray-600">
-                    <th className="py-4 px-5 font-semibold">#</th>
-                    <th className="py-4 px-5 font-semibold">Tên bài tập</th>
-                    <th className="py-4 px-5 font-semibold text-center">Độ khó</th>
-                    <th className="py-4 px-5 font-semibold text-center">Tổng số lượt làm bài</th>
-                    <th className="py-4 px-5 font-semibold text-center">Tỉ lệ AC</th>
-                    <th className="py-4 px-5 font-semibold">Danh mục</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {problems.map((problem) => (
-                    <tr
-                        key={problem.id}
-                        className="border-b hover:bg-gray-50 transition-colors"
-                    >
-                        <td className="py-5 px-5 text-gray-700">{problem.id}</td>
-
-                        <td className="py-5 px-5">
-                            <a className="text-gray-800 hover:text-oj-orange  cursor-pointer font-medium">
-                                {problem.title}
-                            </a>
-                        </td>
-
-                        <td className="py-5 px-5 text-center">
-                            <span className="bg-oj-orange text-white text-xs px-3 py-1 rounded-md font-medium">
-                                {problem.level}
-                            </span>
-                        </td>
-
-                        <td className="py-5 px-5 text-center text-gray-700">
-                            {problem.total}
-                        </td>
-
-                        <td className="py-5 px-5 text-center text-gray-700">
-                            {problem.acRate}
-                        </td>
-
-                        <td className="py-5 px-5">
-                            <div className="flex flex-wrap gap-2">
-                                {problem.tags.map((tag, index) => (
-                                    <span
-                                        key={index}
-                                        className="bg-gray-100 border border-gray-200 text-gray-600 text-xs px-3 py-1 rounded-md"
-                                    >
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                        </td>
+        <>
+            <table className="w-full mt-4 border-collapse bg-white text-sm">
+                <thead>
+                    <tr className="border-b text-left text-gray-600">
+                        <th className="py-4 px-5 font-semibold">#</th>
+                        <th className="py-4 px-5 font-semibold">Tên bài tập</th>
+                        <th className="py-4 px-5 font-semibold text-center">Độ khó</th>
+                        <th className="py-4 px-5 font-semibold text-center">Tổng số lượt làm bài</th>
+                        <th className="py-4 px-5 font-semibold text-center">Tỉ lệ AC</th>
+                        <th className="py-4 px-5 font-semibold">Danh mục</th>
                     </tr>
-                ))}
-            </tbody>
-        </table>
+                </thead>
+
+                <tbody>
+                    {problems.map((problem) => (
+                        <tr
+                            key={problem.id}
+                            className="border-b hover:bg-gray-50 transition-colors"
+                        >
+                            <td className="py-5 px-5 text-gray-700">{problem.id}</td>
+
+                            <td className="py-5 px-5">
+                                <a className="text-gray-800 hover:text-oj-orange  cursor-pointer font-medium">
+                                    {problem.title}
+                                </a>
+                            </td>
+
+                            <td className="py-5 px-5 text-center">
+                                <span className="bg-oj-orange text-white text-xs px-3 py-1 rounded-md font-medium">
+                                    {problem.level}
+                                </span>
+                            </td>
+
+                            <td className="py-5 px-5 text-center text-gray-700">
+                                {problem.total}
+                            </td>
+
+                            <td className="py-5 px-5 text-center text-gray-700">
+                                {problem.acRate}
+                            </td>
+
+                            <td className="py-5 px-5">
+                                <div className="flex flex-wrap gap-2">
+                                    {problem.tags.map((tag, index) => (
+                                        <span
+                                            key={index}
+                                            className="bg-gray-100 border border-gray-200 text-gray-600 text-xs px-3 py-1 rounded-md"
+                                        >
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            <Pagination pagination={pagination}/>
+        </>
+
+
     )
 }
