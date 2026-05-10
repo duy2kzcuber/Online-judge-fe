@@ -1,30 +1,31 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaChartLine, FaTrophy } from "react-icons/fa";
 import { MdGridView, MdKeyboardArrowDown, MdOutlineFormatListBulleted } from "react-icons/md";
 
 const generalChildren = [
-  { href: "/admin/users", label: "User" },
-  { href: "/admin/announcement", label: "Announcement" },
-  { href: "/admin/conf", label: "System Config" },
-  { href: "/admin/judge-server", label: "Judge Server" },
-  { href: "/admin/prune-test-case", label: "Prune Test Case" },
+  { href: "/admin/users", label: "Người dùng" },
+  { href: "/admin/announcement", label: "Thông báo" },
+  { href: "/admin/conf", label: "Cấu hình hệ thống" },
+  { href: "/admin/judge-server", label: "Máy chủ chấm bài" },
+  { href: "/admin/prune-test-case", label: "Dọn dẹp bộ test" },
 ];
 
 const problemChildren = [
-  { href: "/admin/problems", label: "Problem List" },
-  { href: "/admin/problems/create", label: "Create Problem" },
-  { href: "/admin/problems/import-export", label: "Export Or Import Problem" },
+  { href: "/admin/problems", label: "Danh sách bài tập" },
+  { href: "/admin/problems/create", label: "Tạo bài tập" },
+  { href: "/admin/problems/import-export", label: "Nhập / xuất bài tập" },
 ];
 
 const contestChildren = [
-  { href: "/admin/contest", label: "Contest List" },
-  { href: "/admin/contest/create", label: "Create Contest" },
+  { href: "/admin/contest", label: "Danh sách kì thi" },
+  { href: "/admin/contest/create", label: "Tạo kì thi" },
 ];
 
-export const AdminSidebar = () => {
+export const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
   const pathname = usePathname();
 
   const isGeneralSection =
@@ -35,12 +36,21 @@ export const AdminSidebar = () => {
     pathname.startsWith("/admin/prune-test-case");
   const isProblemSection = pathname.startsWith("/admin/problems");
   const isContestSection = pathname.startsWith("/admin/contest");
+  const [generalOpen, setGeneralOpen] = useState(isGeneralSection);
+  const [problemOpen, setProblemOpen] = useState(isProblemSection);
+  const [contestOpen, setContestOpen] = useState(isContestSection);
+
+  useEffect(() => {
+    if (isGeneralSection) setGeneralOpen(true);
+    if (isProblemSection) setProblemOpen(true);
+    if (isContestSection) setContestOpen(true);
+  }, [isGeneralSection, isProblemSection, isContestSection]);
 
   const groupClass = (isActive: boolean) =>
-    `flex items-center justify-between px-[12px] py-[10px] rounded-[8px] border text-[15px] ${
+    `flex items-center justify-between px-[12px] py-[10px] rounded-[8px] border text-[15px] hover:border-oj-orange hover:text-oj-orange ${
       isActive
         ? "border-oj-orange text-oj-orange bg-[#FFF1E9]"
-        : "border-transparent text-[#374151]"
+        : "border-transparent text-[#374151] hover:border-oj-orange hover:text-oj-orange"
     }`;
 
   const childClass = (isActive: boolean) =>
@@ -51,10 +61,14 @@ export const AdminSidebar = () => {
     }`;
 
   return (
-    <aside className="w-[250px] min-h-screen bg-[#FDFDFD] border-r border-[#E5E7EB] px-[14px] py-[16px] fixed left-0 top-0 overflow-y-auto">
+    <aside
+      className={`w-[250px] min-h-screen bg-[#FDFDFD] border-r border-[#E5E7EB] px-[14px] py-[16px] fixed left-0 top-0 overflow-y-auto transition-transform duration-300 ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
       <div className="mb-[14px] flex justify-center">
         <div className="w-[74px] h-[74px] rounded-full border-[3px] border-white bg-[#EAF7FF] text-oj-orange font-[700] flex items-center justify-center shadow-sm">
-          UOJ
+          UTTOJ
         </div>
       </div>
       <ul className="grid gap-y-[8px]">
@@ -70,80 +84,110 @@ export const AdminSidebar = () => {
             <span>
               <FaChartLine />
             </span>
-            <span>Dashboard</span>
+            <span>Tổng quan</span>
           </Link>
         </li>
 
         <li>
-          <div className={groupClass(isGeneralSection)}>
+          <button
+            type="button"
+            onClick={() => setGeneralOpen((prev) => !prev)}
+            className={`${groupClass(isGeneralSection)} w-full`}
+          >
             <span className="flex items-center gap-[10px]">
               <MdGridView />
-              <span>General</span>
+              <span>Cài đặt chung</span>
             </span>
-            <MdKeyboardArrowDown />
-          </div>
-          <div className="mt-[6px] ml-[10px] border-l border-[#E5E7EB] pl-[10px] grid gap-y-[4px]">
-            {generalChildren.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={childClass(isActive)}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
+            <MdKeyboardArrowDown
+              className={`transition-transform duration-200 ${
+                generalOpen ? "rotate-180" : "rotate-0"
+              }`}
+            />
+          </button>
+          {generalOpen && (
+            <div className="mt-[6px] ml-[10px] border-l border-[#E5E7EB] pl-[10px] grid gap-y-[4px]">
+              {generalChildren.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={childClass(isActive)}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </li>
 
         <li>
-          <div className={groupClass(isProblemSection)}>
+          <button
+            type="button"
+            onClick={() => setProblemOpen((prev) => !prev)}
+            className={`${groupClass(isProblemSection)} w-full`}
+          >
             <span className="flex items-center gap-[10px]">
               <MdOutlineFormatListBulleted />
-              <span>Problem</span>
+              <span>Bài tập</span>
             </span>
-            <MdKeyboardArrowDown />
-          </div>
-          <div className="mt-[6px] ml-[10px] border-l border-[#E5E7EB] pl-[10px] grid gap-y-[4px]">
-            {problemChildren.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={childClass(isActive)}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
+            <MdKeyboardArrowDown
+              className={`transition-transform duration-200 ${
+                problemOpen ? "rotate-180" : "rotate-0"
+              }`}
+            />
+          </button>
+          {problemOpen && (
+            <div className="mt-[6px] ml-[10px] border-l border-[#E5E7EB] pl-[10px] grid gap-y-[4px]">
+              {problemChildren.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={childClass(isActive)}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </li>
 
         <li>
-          <div className={groupClass(isContestSection)}>
+          <button
+            type="button"
+            onClick={() => setContestOpen((prev) => !prev)}
+            className={`${groupClass(isContestSection)} w-full`}
+          >
             <span className="flex items-center gap-[10px]">
               <FaTrophy />
-              <span>Contest</span>
+              <span>Kì thi</span>
             </span>
-            <MdKeyboardArrowDown />
-          </div>
-          <div className="mt-[6px] ml-[10px] border-l border-[#E5E7EB] pl-[10px] grid gap-y-[4px]">
-            {contestChildren.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={childClass(isActive)}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
+            <MdKeyboardArrowDown
+              className={`transition-transform duration-200 ${
+                contestOpen ? "rotate-180" : "rotate-0"
+              }`}
+            />
+          </button>
+          {contestOpen && (
+            <div className="mt-[6px] ml-[10px] border-l border-[#E5E7EB] pl-[10px] grid gap-y-[4px]">
+              {contestChildren.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={childClass(isActive)}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </li>
       </ul>
     </aside>
