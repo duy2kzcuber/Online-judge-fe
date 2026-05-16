@@ -1,8 +1,8 @@
 "use client";
 
 import { loginRequest } from "@/lib/auth/auth-api";
-import { clearAccessToken, getAccessToken, setAccessToken } from "@/lib/auth/token";
-import type { LoginCredentials } from "@/lib/api/types";
+import { clearSession, persistSessionFromToken, restoreSessionFromStorage } from "@/lib/auth/session";
+import type { AuthUser, LoginCredentials } from "@/lib/api/types";
 import {
   createContext,
   useCallback,
@@ -14,6 +14,7 @@ import {
 } from "react";
 
 interface AuthContextValue {
+  user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -23,11 +24,14 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsAuthenticated(!!getAccessToken());
+    const restoredUser = restoreSessionFromStorage();
+    setUser(restoredUser);
+    setIsAuthenticated(!!restoredUser);
     setIsLoading(false);
   }, []);
 
@@ -36,18 +40,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!authData.token) {
       throw new Error("Không nhận được token từ máy chủ");
     }
-    setAccessToken(authData.token);
+
+    const authUser = await persistSessionFromToken(authData.token);
+    setUser(authUser);
     setIsAuthenticated(true);
   }, []);
 
   const logout = useCallback(() => {
-    clearAccessToken();
+    clearSession();
+    setUser(null);
     setIsAuthenticated(false);
   }, []);
 
   const value = useMemo(
-    () => ({ isAuthenticated, isLoading, login, logout }),
-    [isAuthenticated, isLoading, login, logout],
+    () => ({ user, isAuthenticated, isLoading, login, logout }),
+    [user, isAuthenticated, isLoading, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

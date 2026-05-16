@@ -14,3 +14,23 @@ export interface LoginCredentials {
   username: string;
   password: string;
 }
+
+export interface AuthUser {
+  userId: string;
+  username: string;
+  email: string;
+  avatar: string;
+  scope: string;
+  roles: string[];
+  permissions: string[];
+  exp?: number;
+}
+
+export interface JwtPayload {
+  sub?: string;
+  userId?: string;
+  scope?: string;
+  exp?: number;
+  iss?: string;
+  jti?: string;
+}

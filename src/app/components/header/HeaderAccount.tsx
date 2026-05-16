@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 export const HeaderAccount = () => {
   const router = useRouter();
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -36,7 +36,10 @@ export const HeaderAccount = () => {
   }
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center gap-[8px]">
+      <span className="hidden md:inline text-[14px] text-black">
+        {user?.username}
+      </span>
       <button
         type="button"
         onClick={handleLogout}

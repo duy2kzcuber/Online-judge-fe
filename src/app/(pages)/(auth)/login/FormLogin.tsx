@@ -54,7 +54,6 @@ export const FormLogin = () => {
         try {
           await login({ username, password });
           router.push("/");
-          router.refresh();
         } catch (error) {
           const message =
             error instanceof Error

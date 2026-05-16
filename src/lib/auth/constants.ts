@@ -5,3 +5,4 @@ export const API_BASE_URL =
 export const API_SUCCESS_CODE = 1000;
 
 export const AUTH_TOKEN_KEY = "oj_access_token";
+export const AUTH_USER_KEY = "oj_user";
