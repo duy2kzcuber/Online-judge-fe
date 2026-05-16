@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "../../globals.css";
 import { Header } from "../../components/header/Header";
+import { Providers } from "../../providers";
 
 
 export const metadata: Metadata = {
@@ -19,8 +20,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="bg-[#EEEEEE]">
-        <Header/>
-        {children}
+        <Providers>
+          <Header />
+          {children}
+        </Providers>
       </body>
     </html>
   );
