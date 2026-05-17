@@ -15,7 +15,7 @@ import type { Role, User } from "@/lib/api/user-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 1;
 
 const inputClass =
   "w-full border border-[#D1D5DB] rounded-[8px] px-[12px] py-[9px] text-[14px] placeholder:text-[#9CA3AF] hover:border-oj-orange focus:border-oj-orange focus:outline-none";
@@ -126,7 +126,7 @@ function AdminUsersPageContent() {
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
     pageSize: PAGE_SIZE,
-    totalPages: 1,
+    totalPages: 10,
     totalItems: 0,
   });
   const [roles, setRoles] = useState<Role[]>([]);
@@ -165,7 +165,7 @@ function AdminUsersPageContent() {
         setPagination({
           page,
           pageSize: data.size ?? PAGE_SIZE,
-          totalPages: Math.max(1, data.totalPages ?? 1),
+          totalPages: Math.max(2, data.totalPages ?? 1),
           totalItems: data.totalElements ?? 0,
         });
       } catch (err) {
@@ -325,6 +325,12 @@ function AdminUsersPageContent() {
     setDeletingId(user.id);
     try {
       await deleteUser(user.id);
+      if (users.length === 1 && page > 1) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("page", String(page - 1));
+        router.push(`/admin/users?${params.toString()}`);
+        return;
+      }
       await reloadList();
     } catch (err) {
       window.alert(
@@ -453,10 +459,8 @@ function AdminUsersPageContent() {
           </table>
         </div>
       )}
+      <Pagination pagination={pagination} basePath="/admin/users" />
 
-      {!loading && !error && (
-        <Pagination pagination={pagination} basePath="/admin/users" />
-      )}
 
       {dialogOpen && (
         <div

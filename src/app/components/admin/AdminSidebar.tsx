@@ -17,6 +17,7 @@ const generalChildren = [
 const problemChildren = [
   { href: "/admin/problems", label: "Danh sách bài tập" },
   { href: "/admin/problems/create", label: "Tạo bài tập" },
+  { href: "/admin/categories", label: "Quản lý danh mục" },
   { href: "/admin/problems/import-export", label: "Nhập / xuất bài tập" },
 ];
 
@@ -34,7 +35,9 @@ export const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
     pathname.startsWith("/admin/conf") ||
     pathname.startsWith("/admin/judge-server") ||
     pathname.startsWith("/admin/prune-test-case");
-  const isProblemSection = pathname.startsWith("/admin/problems");
+  const isProblemSection =
+    pathname.startsWith("/admin/problems") ||
+    pathname.startsWith("/admin/categories");
   const isContestSection = pathname.startsWith("/admin/contest");
   const [generalOpen, setGeneralOpen] = useState(isGeneralSection);
   const [problemOpen, setProblemOpen] = useState(isProblemSection);
