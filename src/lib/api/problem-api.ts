@@ -3,10 +3,34 @@ import type {
   Category,
   Problem,
   ProblemListParams,
+  ProblemRequestPayload,
   SpringPage,
 } from "@/lib/api/problem-types";
 import { API_BASE_URL, API_SUCCESS_CODE } from "@/lib/auth/constants";
 import { getAccessToken } from "@/lib/auth/token";
+
+function authHeaders(json = false): HeadersInit {
+  const token = getAccessToken();
+  return {
+    ...(json ? { "Content-Type": "application/json" } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
+function buildMultipartBody(
+  request: ProblemRequestPayload,
+  testCaseFile?: File | null,
+): FormData {
+  const formData = new FormData();
+  formData.append(
+    "request",
+    new Blob([JSON.stringify(request)], { type: "application/json" }),
+  );
+  if (testCaseFile) {
+    formData.append("test_case", testCaseFile);
+  }
+  return formData;
+}
 
 function buildProblemQuery(params: ProblemListParams): string {
   const qs = new URLSearchParams();
@@ -58,13 +82,53 @@ export async function fetchCategories(): Promise<Category[]> {
   return body.data;
 }
 
+export async function createProblem(
+  request: ProblemRequestPayload,
+  testCaseFile?: File | null,
+): Promise<Problem> {
+  const response = await fetch(`${API_BASE_URL}/problems`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: buildMultipartBody(request, testCaseFile),
+  });
+  const body = (await response.json()) as BaseAPIResponse<Problem>;
+  if (!response.ok || body.code !== API_SUCCESS_CODE || !body.data) {
+    throw new Error(body.message ?? "Không thể tạo bài tập");
+  }
+  return body.data;
+}
+
+export async function updateProblem(
+  problemId: string,
+  request: ProblemRequestPayload,
+  testCaseFile?: File | null,
+): Promise<Problem> {
+  const response = await fetch(`${API_BASE_URL}/problems/${problemId}`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: buildMultipartBody(request, testCaseFile),
+  });
+  const body = (await response.json()) as BaseAPIResponse<Problem>;
+  if (!response.ok || body.code !== API_SUCCESS_CODE || !body.data) {
+    throw new Error(body.message ?? "Không thể cập nhật bài tập");
+  }
+  return body.data;
+}
+
+export async function deleteProblem(problemId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/problems/${problemId}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  const body = (await response.json()) as BaseAPIResponse<unknown>;
+  if (!response.ok || body.code !== API_SUCCESS_CODE) {
+    throw new Error(body.message ?? "Không thể xóa bài tập");
+  }
+}
+
 async function apiFetch<T>(path: string): Promise<BaseAPIResponse<T>> {
-  const token = getAccessToken();
   const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+    headers: authHeaders(true),
     cache: "no-store",
   });
   return response.json();

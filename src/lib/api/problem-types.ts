@@ -11,8 +11,24 @@ export interface Problem {
   memoryLimit?: number;
   allowedLanguage?: string[];
   isPublic?: boolean;
+  isShareSubmission?: boolean;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface ProblemRequestPayload {
+  title: string;
+  description: string;
+  inputDescription: string;
+  outputDescription: string;
+  sampleTestcase?: string;
+  isPublic: boolean;
+  isShareSubmission: boolean;
+  timeLimit: number;
+  memoryLimit: number;
+  allowedLanguage: string[];
+  categories?: string[];
+  difficulty?: number;
 }
 
 export interface Category {
