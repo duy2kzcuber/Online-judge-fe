@@ -7,11 +7,11 @@ import { FaChartLine, FaTrophy } from "react-icons/fa";
 import { MdGridView, MdKeyboardArrowDown, MdOutlineFormatListBulleted } from "react-icons/md";
 
 const generalChildren = [
-  { href: "/admin/users", label: "Người dùng" },
-  { href: "/admin/announcement", label: "Thông báo" },
-  { href: "/admin/conf", label: "Cấu hình hệ thống" },
-  { href: "/admin/judge-server", label: "Máy chủ chấm bài" },
-  { href: "/admin/prune-test-case", label: "Dọn dẹp bộ test" },
+  { href: "/admin/users", label: "Quản lý Người dùng" },
+  { href: "/admin/announcement", label: "Quản lý bài viết" },
+  // { href: "/admin/conf", label: "Cấu hình hệ thống" },
+  // { href: "/admin/judge-server", label: "Máy chủ chấm bài" },
+  // { href: "/admin/prune-test-case", label: "Dọn dẹp bộ test" },
 ];
 
 const problemChildren = [
