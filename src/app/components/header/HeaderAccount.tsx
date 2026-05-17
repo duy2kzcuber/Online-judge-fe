@@ -3,6 +3,20 @@
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { FiChevronDown } from "react-icons/fi";
+import type { ReactNode } from "react";
+
+const menuLinkClass =
+  "block w-full px-[16px] py-[10px] text-[14px] font-[500] text-black hover:text-oj-orange hover:bg-[#FFF5EE] transition-colors";
+
+const pillButtonClass =
+  "border-[0.8px] border-[#DEDEDE] rounded-[20px] text-[12px] md:text-[16px] text-black hover:border-oj-orange hover:text-oj-orange transition-colors";
+
+function AccountSlot({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex items-center justify-center min-w-[100px]">{children}</div>
+  );
+}
 
 export const HeaderAccount = () => {
   const router = useRouter();
@@ -11,42 +25,95 @@ export const HeaderAccount = () => {
   const handleLogout = () => {
     logout();
     router.push("/login");
-    router.refresh();
   };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-w-[100px]">
+      <AccountSlot>
         <span className="text-[12px] md:text-[14px] text-gray-400">...</span>
-      </div>
+      </AccountSlot>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="flex items-center justify-center">
-        <Link
-          href="/login"
-          className="border-[0.8px] rounded-[20px] px-[15px] py-[6px] hover:border-oj-orange hover:text-oj-orange text-[12px] md:text-[16px]"
-        >
+      <AccountSlot>
+        <Link href="/login" className={`${pillButtonClass} px-[15px] py-[6px]`}>
           Đăng nhập
         </Link>
-      </div>
+      </AccountSlot>
     );
   }
 
+  const displayName = user?.username ?? "Tài khoản";
+
+  //Todo :  thực hiện phân quyền sau
+  // const isAdmin = user?.roles?.some((role) => role.toLowerCase() === "admin");
+  const isAdmin = true;
   return (
-    <div className="flex items-center justify-center gap-[8px]">
-      <span className="hidden md:inline text-[14px] text-black">
-        {user?.username}
-      </span>
-      <button
-        type="button"
-        onClick={handleLogout}
-        className="border-[0.8px] rounded-[20px] px-[15px] py-[6px] hover:border-oj-orange hover:text-oj-orange text-[12px] md:text-[16px]"
-      >
-        Đăng xuất
-      </button>
-    </div>
+    <AccountSlot>
+      <div className="relative group">
+        <button
+          type="button"
+          className={`${pillButtonClass} flex items-center gap-[8px] pl-[6px] pr-[12px] py-[4px] text-[12px] md:text-[14px]`}
+          aria-haspopup="true"
+        >
+          {user?.avatar ? (
+            <img
+              src={user.avatar}
+              alt={displayName}
+              className="h-[32px] w-[32px] rounded-full object-cover border border-[#DEDEDE]"
+            />
+          ) : (
+            <span className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-oj-orange text-[13px] font-[600] text-white uppercase">
+              {displayName.charAt(0)}
+            </span>
+          )}
+          <span className="hidden md:inline max-w-[120px] truncate font-[500]">
+            {displayName}
+          </span>
+          <FiChevronDown className="shrink-0 text-[16px]" />
+        </button>
+
+        <ul
+          className="absolute top-[calc(100%+8px)] right-0 z-[999] min-w-[220px] overflow-hidden rounded-[8px] border border-[#DEDEDE] bg-oj-white py-[6px] shadow-[0_4px_20px_rgba(0,0,0,0.08)] opacity-0 invisible translate-y-[-4px] transition-all duration-200 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0"
+          role="menu"
+        >
+          <li role="none">
+            <Link href="/" className={menuLinkClass} role="menuitem">
+              Trang chủ
+            </Link>
+          </li>
+          <li role="none">
+            <Link href="/problem" className={menuLinkClass} role="menuitem">
+              Bài tập
+            </Link>
+          </li>
+          <li role="none">
+            <Link href="#" className={menuLinkClass} role="menuitem">
+              Các bài tập đã nộp
+            </Link>
+          </li>
+          {isAdmin && (
+            <li role="none">
+              <Link href="/admin" className={menuLinkClass} role="menuitem">
+                Trang quản trị
+              </Link>
+            </li>
+          )}
+          <li className="my-[4px] border-t border-[#DEDEDE]" role="separator" />
+          <li role="none">
+            <button
+              type="button"
+              onClick={handleLogout}
+              className={`${menuLinkClass} text-left text-oj-orange`}
+              role="menuitem"
+            >
+              Đăng xuất
+            </button>
+          </li>
+        </ul>
+      </div>
+    </AccountSlot>
   );
 };
