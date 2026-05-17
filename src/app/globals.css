@@ -61,6 +61,27 @@ select, input, textarea {
   /* 2xl cũng sẽ dừng ở 1216px theo yêu cầu của bạn */
 }
 
+.announcement-content p {
+  margin-bottom: 0.75em;
+}
 
+.announcement-content p:last-child {
+  margin-bottom: 0;
+}
 
+.announcement-content a {
+  color: var(--color-oj-orange);
+  text-decoration: underline;
+}
+
+.announcement-content ul,
+.announcement-content ol {
+  margin: 0.5em 0 0.75em 1.25em;
+}
+
+.announcement-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
 
