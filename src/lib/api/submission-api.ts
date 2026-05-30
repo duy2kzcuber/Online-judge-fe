@@ -3,9 +3,14 @@ import type { Submission, SubmissionRequest } from "@/lib/api/submission-types";
 import { API_BASE_URL, API_SUCCESS_CODE } from "@/lib/auth/constants";
 import { getAccessToken } from "@/lib/auth/token";
 
+export interface CreateSubmissionResult {
+  submission: Submission;
+  message?: string;
+}
+
 export async function createSubmission(
   request: SubmissionRequest,
-): Promise<Submission> {
+): Promise<CreateSubmissionResult> {
   const token = getAccessToken();
   if (!token) {
     throw new Error("Vui lòng đăng nhập để nộp bài");
@@ -26,5 +31,8 @@ export async function createSubmission(
     throw new Error(body.message ?? "Nộp bài thất bại");
   }
 
-  return body.data;
+  return {
+    submission: body.data,
+    message: body.message,
+  };
 }

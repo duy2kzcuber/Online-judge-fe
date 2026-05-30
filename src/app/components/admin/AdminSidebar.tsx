@@ -18,7 +18,7 @@ const problemChildren = [
   { href: "/admin/problems", label: "Danh sách bài tập" },
   { href: "/admin/problems/create", label: "Tạo bài tập" },
   { href: "/admin/categories", label: "Quản lý danh mục" },
-  { href: "/admin/problems/import-export", label: "Nhập / xuất bài tập" },
+//  { href: "/admin/problems/import-export", label: "Nhập / xuất bài tập" },
 ];
 
 const contestChildren = [

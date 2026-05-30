@@ -27,7 +27,14 @@ function buildMultipartBody(
     new Blob([JSON.stringify(request)], { type: "application/json" }),
   );
   if (testCaseFile) {
-    formData.append("test_case", testCaseFile);
+    const zipFile = new File(
+      [testCaseFile],
+      testCaseFile.name,
+      {
+        type: "application/zip",
+      },
+    );
+    formData.append("test_case", zipFile);
   }
   return formData;
 }

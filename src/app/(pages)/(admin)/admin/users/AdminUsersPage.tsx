@@ -15,7 +15,7 @@ import type { Role, User } from "@/lib/api/user-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 
-const PAGE_SIZE = 1;
+const PAGE_SIZE = 10;
 
 const inputClass =
   "w-full border border-[#D1D5DB] rounded-[8px] px-[12px] py-[9px] text-[14px] placeholder:text-[#9CA3AF] hover:border-oj-orange focus:border-oj-orange focus:outline-none";
@@ -165,7 +165,7 @@ function AdminUsersPageContent() {
         setPagination({
           page,
           pageSize: data.size ?? PAGE_SIZE,
-          totalPages: Math.max(2, data.totalPages ?? 1),
+          totalPages: Math.max(1, data.totalPages ?? 1),
           totalItems: data.totalElements ?? 0,
         });
       } catch (err) {

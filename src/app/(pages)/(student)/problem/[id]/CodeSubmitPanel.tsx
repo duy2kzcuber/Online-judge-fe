@@ -11,9 +11,14 @@ import {
   normalizeLanguages,
 } from "@/lib/submission/language";
 import dynamic from "next/dynamic";
-import { getResultLabel, RESULT_STYLES } from "@/lib/submission/result";
+import {
+  FEEDBACK_BANNER_STYLES,
+  getResultLabel,
+  getSubmitFeedback,
+  resolveResultStyle,
+} from "@/lib/submission/result";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const MonacoCodeEditor = dynamic(
   () =>
@@ -52,6 +57,8 @@ export function CodeSubmitPanel({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Submission | null>(null);
+  const [apiMessage, setApiMessage] = useState<string | null>(null);
+  const feedbackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!languages.includes(language)) {
@@ -65,7 +72,14 @@ export function CodeSubmitPanel({
     setCode(getCodeTemplate(next));
     setResult(null);
     setError(null);
+    setApiMessage(null);
   };
+
+  useEffect(() => {
+    if ((result || error) && feedbackRef.current) {
+      feedbackRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [result, error]);
 
   const handleSubmit = useCallback(async () => {
     if (!code.trim()) {
@@ -76,14 +90,16 @@ export function CodeSubmitPanel({
     setSubmitting(true);
     setError(null);
     setResult(null);
+    setApiMessage(null);
 
     try {
-      const submission = await createSubmission({
+      const { submission, message } = await createSubmission({
         problemId,
         language,
         solution: code,
       });
       setResult(submission);
+      setApiMessage(message ?? null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Nộp bài thất bại");
     } finally {
@@ -115,7 +131,13 @@ export function CodeSubmitPanel({
     );
   }
 
-  const resultStyle = result?.result ? RESULT_STYLES[result.result] : null;
+  const resultStyle = resolveResultStyle(result?.result);
+  const submitFeedback = result ? getSubmitFeedback(result.result) : null;
+  const bannerStyle = error
+    ? FEEDBACK_BANNER_STYLES.error
+    : submitFeedback
+      ? FEEDBACK_BANNER_STYLES[submitFeedback.tone]
+      : null;
 
   return (
     <div className="flex flex-col h-full min-h-[480px] rounded-[8px] border border-[#DEDEDE] bg-oj-white overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
@@ -161,6 +183,7 @@ export function CodeSubmitPanel({
         onChange={(next) => {
           setCode(next);
           setError(null);
+          setApiMessage(null);
         }}
         language={language}
         readOnly={submitting}
@@ -168,16 +191,33 @@ export function CodeSubmitPanel({
       />
 
       <div>
-        {error && (
-          <p
-            role="alert"
-            className="mx-[16px] mt-[12px] rounded-[6px] border border-red-200 bg-red-50 px-[12px] py-[10px] text-[13px] text-red-600"
-          >
-            {error}
-          </p>
+        {(error || result) && (
+          <div ref={feedbackRef} className="mx-[16px] mt-[12px]" role="status" aria-live="polite">
+            {error ? (
+              <div
+                className={`rounded-[8px] border-2 px-[16px] py-[14px] shadow-sm ${FEEDBACK_BANNER_STYLES.error.border} ${FEEDBACK_BANNER_STYLES.error.bg}`}
+              >
+                <p className={`text-[15px] font-[600] ${FEEDBACK_BANNER_STYLES.error.title}`}>
+                  Nộp bài thất bại
+                </p>
+                <p className="text-[13px] text-red-700 mt-[4px]">{error}</p>
+              </div>
+            ) : submitFeedback && bannerStyle ? (
+              <div
+                className={`rounded-[8px] border-2 px-[16px] py-[14px] shadow-sm ${bannerStyle.border} ${bannerStyle.bg}`}
+              >
+                <p className={`text-[15px] font-[600] ${bannerStyle.title}`}>
+                  {submitFeedback.title}
+                </p>
+                <p className={`text-[13px] mt-[4px] ${bannerStyle.title} opacity-90`}>
+                  {apiMessage ?? submitFeedback.description}
+                </p>
+              </div>
+            ) : null}
+          </div>
         )}
 
-        {result && resultStyle && (
+        {result && (
           <div
             className={`mx-[16px] mt-[12px] rounded-[6px] border px-[14px] py-[12px] ${resultStyle.border} ${resultStyle.bg}`}
           >
@@ -219,6 +259,7 @@ export function CodeSubmitPanel({
               setCode(getCodeTemplate(language));
               setResult(null);
               setError(null);
+              setApiMessage(null);
             }}
             className="h-[40px] px-[16px] rounded-[6px] border border-[#DEDEDE] text-[14px] text-gray-700 hover:border-oj-orange hover:text-oj-orange transition-colors disabled:opacity-50"
           >
