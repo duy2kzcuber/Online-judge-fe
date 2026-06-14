@@ -4,6 +4,7 @@ import type {
   UserCreatePayload,
   UserPage,
   UserUpdatePayload,
+  UserUpdateResult,
 } from "@/lib/api/user-types";
 import type { BaseAPIResponse } from "@/lib/api/types";
 import { apiFetch } from "@/lib/api/client";
@@ -88,7 +89,7 @@ export async function updateUser(
   userId: string,
   payload: UserUpdatePayload,
   avatar?: File | null,
-): Promise<User> {
+): Promise<UserUpdateResult> {
   const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
     method: "PUT",
     headers: authHeaders(),
@@ -98,7 +99,7 @@ export async function updateUser(
   if (!response.ok || body.code !== API_SUCCESS_CODE || !body.data) {
     throw new Error(body.message ?? "Không thể cập nhật người dùng");
   }
-  return body.data;
+  return { user: body.data, token: body.token };
 }
 
 export async function deleteUser(userId: string): Promise<void> {

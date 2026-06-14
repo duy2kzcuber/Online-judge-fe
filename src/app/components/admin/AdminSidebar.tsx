@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import type { AuthUser } from "@/lib/api/types";
+import { canAccessAdminPath } from "@/lib/auth/admin-access";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaChartLine, FaTrophy } from "react-icons/fa";
@@ -8,17 +11,14 @@ import { MdGridView, MdKeyboardArrowDown, MdOutlineFormatListBulleted } from "re
 
 const generalChildren = [
   { href: "/admin/users", label: "Quản lý Người dùng" },
+  { href: "/admin/roles", label: "Quản lý vai trò & quyền" },
   { href: "/admin/announcement", label: "Quản lý bài viết" },
-  // { href: "/admin/conf", label: "Cấu hình hệ thống" },
-  // { href: "/admin/judge-server", label: "Máy chủ chấm bài" },
-  // { href: "/admin/prune-test-case", label: "Dọn dẹp bộ test" },
 ];
 
 const problemChildren = [
   { href: "/admin/problems", label: "Danh sách bài tập" },
   { href: "/admin/problems/create", label: "Tạo bài tập" },
   { href: "/admin/categories", label: "Quản lý danh mục" },
-//  { href: "/admin/problems/import-export", label: "Nhập / xuất bài tập" },
 ];
 
 const contestChildren = [
@@ -26,11 +26,33 @@ const contestChildren = [
   { href: "/admin/contest/create", label: "Tạo kì thi" },
 ];
 
+type NavItem = { href: string; label: string };
+
+function filterNavItems(items: NavItem[], user: AuthUser | null) {
+  return items.filter((item) => canAccessAdminPath(user, item.href));
+}
+
 export const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  const visibleGeneralChildren = useMemo(
+    () => filterNavItems(generalChildren, user),
+    [user],
+  );
+  const visibleProblemChildren = useMemo(
+    () => filterNavItems(problemChildren, user),
+    [user],
+  );
+  const visibleContestChildren = useMemo(
+    () => filterNavItems(contestChildren, user),
+    [user],
+  );
+  const showDashboard = canAccessAdminPath(user, "/admin");
 
   const isGeneralSection =
     pathname.startsWith("/admin/users") ||
+    pathname.startsWith("/admin/roles") ||
     pathname.startsWith("/admin/announcement") ||
     pathname.startsWith("/admin/conf") ||
     pathname.startsWith("/admin/judge-server") ||
@@ -75,22 +97,25 @@ export const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
         </div>
       </div>
       <ul className="grid gap-y-[8px]">
-        <li>
-          <Link
-            href="/admin"
-            className={`flex items-center gap-[10px] px-[12px] py-[10px] rounded-[8px] border text-[15px] ${
-              pathname === "/admin"
-                ? "border-oj-orange text-oj-orange bg-[#FFF1E9]"
-                : "border-transparent hover:border-[#F3D3BF] hover:text-oj-orange"
-            }`}
-          >
-            <span>
-              <FaChartLine />
-            </span>
-            <span>Tổng quan</span>
-          </Link>
-        </li>
+        {showDashboard && (
+          <li>
+            <Link
+              href="/admin"
+              className={`flex items-center gap-[10px] px-[12px] py-[10px] rounded-[8px] border text-[15px] ${
+                pathname === "/admin"
+                  ? "border-oj-orange text-oj-orange bg-[#FFF1E9]"
+                  : "border-transparent hover:border-[#F3D3BF] hover:text-oj-orange"
+              }`}
+            >
+              <span>
+                <FaChartLine />
+              </span>
+              <span>Tổng quan</span>
+            </Link>
+          </li>
+        )}
 
+        {visibleGeneralChildren.length > 0 && (
         <li>
           <button
             type="button"
@@ -109,7 +134,7 @@ export const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
           </button>
           {generalOpen && (
             <div className="mt-[6px] ml-[10px] border-l border-[#E5E7EB] pl-[10px] grid gap-y-[4px]">
-              {generalChildren.map((item) => {
+              {visibleGeneralChildren.map((item) => {
                 const isActive = pathname === item.href;
                 return (
                   <Link
@@ -124,7 +149,9 @@ export const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
             </div>
           )}
         </li>
+        )}
 
+        {visibleProblemChildren.length > 0 && (
         <li>
           <button
             type="button"
@@ -143,7 +170,7 @@ export const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
           </button>
           {problemOpen && (
             <div className="mt-[6px] ml-[10px] border-l border-[#E5E7EB] pl-[10px] grid gap-y-[4px]">
-              {problemChildren.map((item) => {
+              {visibleProblemChildren.map((item) => {
                 const isActive = pathname === item.href;
                 return (
                   <Link
@@ -158,7 +185,9 @@ export const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
             </div>
           )}
         </li>
+        )}
 
+        {visibleContestChildren.length > 0 && (
         <li>
           <button
             type="button"
@@ -177,7 +206,7 @@ export const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
           </button>
           {contestOpen && (
             <div className="mt-[6px] ml-[10px] border-l border-[#E5E7EB] pl-[10px] grid gap-y-[4px]">
-              {contestChildren.map((item) => {
+              {visibleContestChildren.map((item) => {
                 const isActive = pathname === item.href;
                 return (
                   <Link
@@ -192,6 +221,7 @@ export const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
             </div>
           )}
         </li>
+        )}
       </ul>
     </aside>
   );

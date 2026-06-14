@@ -34,3 +34,8 @@ export interface UserUpdatePayload {
 }
 
 export type UserPage = SpringPage<User>;
+
+export interface UserUpdateResult {
+  user: User;
+  token?: string;
+}

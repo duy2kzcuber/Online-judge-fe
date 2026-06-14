@@ -14,6 +14,7 @@ import {
 import type { Role, User } from "@/lib/api/user-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const PAGE_SIZE = 10;
 
@@ -118,6 +119,7 @@ function RoleCheckboxes({
 
 function AdminUsersPageContent() {
   const router = useRouter();
+  const { applySessionToken } = useAuth();
   const searchParams = useSearchParams();
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
   const keywordParam = searchParams.get("keyword") ?? "";
@@ -304,7 +306,10 @@ function AdminUsersPageContent() {
       if (editForm.password.trim()) {
         payload.password = editForm.password;
       }
-      await updateUser(editingUser.id, payload);
+      const { token } = await updateUser(editingUser.id, payload);
+      if (token) {
+        await applySessionToken(token);
+      }
       closeDialog();
       await reloadList();
     } catch (err) {

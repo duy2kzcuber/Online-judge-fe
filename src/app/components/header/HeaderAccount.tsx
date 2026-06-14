@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { canAccessAnyAdminRoute, getFirstAccessibleAdminPath } from "@/lib/auth/admin-access";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FiChevronDown } from "react-icons/fi";
@@ -46,10 +47,8 @@ export const HeaderAccount = () => {
   }
 
   const displayName = user?.username ?? "Tài khoản";
-
-  //Todo :  thực hiện phân quyền sau
-  // const isAdmin = user?.roles?.some((role) => role.toLowerCase() === "admin");
-  const isAdmin = true;
+  const adminHref = getFirstAccessibleAdminPath(user);
+  const showAdminLink = canAccessAnyAdminRoute(user);
   return (
     <AccountSlot>
       <div className="relative group">
@@ -94,9 +93,9 @@ export const HeaderAccount = () => {
               Các bài tập đã nộp
             </Link>
           </li>
-          {isAdmin && (
+          {showAdminLink && adminHref && (
             <li role="none">
-              <Link href="/admin" className={menuLinkClass} role="menuitem">
+              <Link href={adminHref} className={menuLinkClass} role="menuitem">
                 Trang quản trị
               </Link>
             </li>

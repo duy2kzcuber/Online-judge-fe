@@ -2,6 +2,7 @@ export interface BaseAPIResponse<T = unknown> {
   code: number;
   message?: string;
   data?: T;
+  token?: string;
 }
 
 export interface AuthResponse {

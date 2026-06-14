@@ -19,6 +19,7 @@ interface AuthContextValue {
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => void;
+  applySessionToken: (token: string) => Promise<AuthUser>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -52,9 +53,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(false);
   }, []);
 
+  const applySessionToken = useCallback(async (token: string) => {
+    const authUser = await persistSessionFromToken(token);
+    setUser(authUser);
+    setIsAuthenticated(true);
+    return authUser;
+  }, []);
+
   const value = useMemo(
-    () => ({ user, isAuthenticated, isLoading, login, logout }),
-    [user, isAuthenticated, isLoading, login, logout],
+    () => ({ user, isAuthenticated, isLoading, login, logout, applySessionToken }),
+    [user, isAuthenticated, isLoading, login, logout, applySessionToken],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
