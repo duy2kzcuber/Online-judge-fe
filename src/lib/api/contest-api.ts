@@ -4,6 +4,7 @@ import type {
   ContestJoinResult,
   ContestPage,
   ContestParticipant,
+  ContestParticipantDetail,
   ContestProblemItem,
   ContestScore,
 } from "@/lib/api/contest-types";
@@ -135,6 +136,21 @@ export async function fetchContestParticipants(
 
   if (response.code !== API_SUCCESS_CODE || !response.data) {
     throw new Error(response.message ?? "Không thể tải danh sách thí sinh");
+  }
+
+  return response.data;
+}
+
+export async function fetchContestParticipantDetail(
+  contestId: number,
+  userId: string,
+): Promise<ContestParticipantDetail> {
+  const response = await apiFetch<ContestParticipantDetail>(
+    `/contests/${contestId}/participants/${encodeURIComponent(userId)}`,
+  );
+
+  if (response.code !== API_SUCCESS_CODE || !response.data) {
+    throw new Error(response.message ?? "Không thể tải chi tiết thí sinh");
   }
 
   return response.data;

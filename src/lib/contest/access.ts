@@ -30,3 +30,12 @@ export function getContestPassword(contestId: number): string | null {
   if (!canUseSessionStorage()) return null;
   return sessionStorage.getItem(`${PASSWORD_PREFIX}${contestId}`);
 }
+
+export function hasStoredContestPassword(contestId: number): boolean {
+  const password = getContestPassword(contestId);
+  return password != null && password.trim().length > 0;
+}
+
+export function hasContestAccess(contestId: number): boolean {
+  return isContestJoined(contestId) || hasStoredContestPassword(contestId);
+}

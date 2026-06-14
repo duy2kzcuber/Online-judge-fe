@@ -24,13 +24,16 @@ export default function ProblemDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-    fetchProblemById(id)
+    setLoading(true);
+    setError(null);
+    setProblem(null);
+    fetchProblemById(id, contestId != null ? { contestId } : undefined)
       .then(setProblem)
       .catch((err) =>
         setError(err instanceof Error ? err.message : "Không tải được bài tập"),
       )
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, contestId]);
 
   return (
     <div className="container pt-[100px] pb-[40px]">

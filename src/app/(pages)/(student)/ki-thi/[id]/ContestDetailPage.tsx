@@ -15,8 +15,10 @@ import type {
   ContestScore,
 } from "@/lib/api/contest-types";
 import {
+  clearContestAccess,
   getContestPassword,
-  isContestJoined,
+  hasContestAccess,
+  hasStoredContestPassword,
   markContestJoined,
   saveContestPassword,
 } from "@/lib/contest/access";
@@ -64,7 +66,8 @@ export function ContestDetailPage({ contestId }: ContestDetailPageProps) {
   const [joinError, setJoinError] = useState<string | null>(null);
   const [joinMessage, setJoinMessage] = useState<string | null>(null);
   const [passwordInput, setPasswordInput] = useState("");
-  const [hasJoined, setHasJoined] = useState(false);
+  const [hasJoined, setHasJoined] = useState(() => hasContestAccess(contestId));
+  const [autoJoinAttempted, setAutoJoinAttempted] = useState(false);
 
   const status: ContestStatus | null = useMemo(
     () => (contest ? resolveContestStatus(contest) : null),
@@ -93,7 +96,8 @@ export function ContestDetailPage({ contestId }: ContestDetailPageProps) {
   }, [loadContest]);
 
   useEffect(() => {
-    setHasJoined(isContestJoined(contestId));
+    setHasJoined(hasContestAccess(contestId));
+    setAutoJoinAttempted(false);
   }, [contestId]);
 
   const loadProblemsWithStatus = useCallback(async (password?: string) => {
@@ -136,6 +140,17 @@ export function ContestDetailPage({ contestId }: ContestDetailPageProps) {
         if (!join.accessGranted) {
           setJoinError(message ?? "Không thể tham gia kì thi");
           setHasJoined(false);
+
+          const trimmedPassword = password?.trim();
+          const storedPassword = getContestPassword(contestId)?.trim();
+          if (
+            trimmedPassword &&
+            storedPassword &&
+            trimmedPassword === storedPassword
+          ) {
+            clearContestAccess(contestId);
+            setAutoJoinAttempted(false);
+          }
           return;
         }
 
@@ -204,15 +219,32 @@ export function ContestDetailPage({ contestId }: ContestDetailPageProps) {
       !isAuthenticated ||
       authLoading ||
       status !== "ongoing" ||
-      hasJoined
+      hasJoined ||
+      autoJoinAttempted
     ) {
       return;
     }
 
     if (!contest.passwordProtected) {
       void handleJoin();
+      return;
     }
-  }, [authLoading, contest, handleJoin, hasJoined, isAuthenticated, status]);
+
+    const storedPassword = getContestPassword(contestId);
+    if (storedPassword?.trim()) {
+      setAutoJoinAttempted(true);
+      void handleJoin(storedPassword);
+    }
+  }, [
+    authLoading,
+    autoJoinAttempted,
+    contest,
+    contestId,
+    handleJoin,
+    hasJoined,
+    isAuthenticated,
+    status,
+  ]);
 
   const loadScore = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -257,6 +289,8 @@ export function ContestDetailPage({ contestId }: ContestDetailPageProps) {
     status === "ongoing" &&
     contest.passwordProtected &&
     !hasJoined &&
+    !hasStoredContestPassword(contestId) &&
+    !joining &&
     isAuthenticated;
 
   const showLoginPrompt = status === "ongoing" && !authLoading && !isAuthenticated;
@@ -431,6 +465,16 @@ export function ContestDetailPage({ contestId }: ContestDetailPageProps) {
           )}
         </div>
       )}
+
+      {status === "ongoing" &&
+        contest.passwordProtected &&
+        !hasJoined &&
+        hasStoredContestPassword(contestId) &&
+        joining && (
+          <p className="text-[14px] text-gray-500 text-center py-[12px]">
+            Đang xác nhận quyền tham gia...
+          </p>
+        )}
 
       {status === "ongoing" && hasJoined && joining && (
         <p className="text-[14px] text-gray-500 text-center py-[12px]">

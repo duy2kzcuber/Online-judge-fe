@@ -1,4 +1,5 @@
 import type { SpringPage } from "@/lib/api/problem-types";
+import type { Submission } from "@/lib/api/submission-types";
 import type { ContestStatus } from "@/lib/contest/status";
 
 export interface ContestCreator {
@@ -63,6 +64,27 @@ export interface ContestParticipant {
   solvedCount: number;
   totalProblems: number;
   submissionCount: number;
+}
+
+export interface ContestParticipantProblemDetail {
+  problemId: string;
+  problemTitle?: string | null;
+  sortIndex: number;
+  bestScore?: string | null;
+  bestResult?: string | null;
+  submissionCount: number;
+  submissions: Submission[];
+}
+
+export interface ContestParticipantDetail {
+  userId: string;
+  username: string;
+  fullName?: string | null;
+  totalScore: number;
+  solvedCount: number;
+  totalProblems: number;
+  submissionCount: number;
+  problems: ContestParticipantProblemDetail[];
 }
 
 export interface ContestProblemPayload {

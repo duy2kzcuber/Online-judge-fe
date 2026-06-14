@@ -73,8 +73,15 @@ export async function fetchProblems(
   return response.json() as Promise<SpringPage<Problem>>;
 }
 
-export async function fetchProblemById(id: string): Promise<Problem> {
-  const body = await apiFetch<Problem>(`/problems/${id}`);
+export async function fetchProblemById(
+  id: string,
+  options?: { contestId?: number },
+): Promise<Problem> {
+  const query =
+    options?.contestId != null
+      ? `?contestId=${encodeURIComponent(String(options.contestId))}`
+      : "";
+  const body = await apiFetch<Problem>(`/problems/${id}${query}`);
   if (body.code !== API_SUCCESS_CODE || !body.data) {
     throw new Error(body.message ?? "Không tìm thấy bài tập");
   }

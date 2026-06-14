@@ -9,6 +9,7 @@ import {
 } from "@/lib/contest/status";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { ParticipantDetailDialog } from "./ParticipantDetailDialog";
 
 function formatDateTime(iso?: string | null): string {
   if (!iso) return "—";
@@ -37,6 +38,8 @@ export function AdminContestParticipantsPage({
   const [keyword, setKeyword] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedParticipant, setSelectedParticipant] =
+    useState<ContestParticipant | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -173,6 +176,7 @@ export function AdminContestParticipantsPage({
                 <th className="py-[12px] px-[12px] w-[120px]">Tổng điểm</th>
                 <th className="py-[12px] px-[12px] w-[120px]">Bài đúng</th>
                 <th className="py-[12px] px-[12px] w-[120px]">Lượt nộp</th>
+                <th className="py-[12px] px-[12px] w-[120px]">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -197,11 +201,28 @@ export function AdminContestParticipantsPage({
                   <td className="py-[12px] px-[12px]">
                     {participant.submissionCount}
                   </td>
+                  <td className="py-[12px] px-[12px]">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedParticipant(participant)}
+                      className="inline-flex h-[32px] items-center rounded-[6px] border border-[#D1D5DB] px-[10px] text-[13px] hover:border-oj-orange hover:text-oj-orange"
+                    >
+                      Chi tiết
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+
+      {selectedParticipant && (
+        <ParticipantDetailDialog
+          contestId={contestId}
+          participant={selectedParticipant}
+          onClose={() => setSelectedParticipant(null)}
+        />
       )}
     </div>
   );
