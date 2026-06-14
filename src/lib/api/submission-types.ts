@@ -5,11 +5,14 @@ export interface SubmissionRequest {
   language: string;
   solution: string;
   score?: string;
+  contestId?: number;
+  contestPassword?: string;
 }
 
 export interface Submission {
   id: string;
   problemId: string;
+  contestId?: number | null;
   language: string;
   solution?: string;
   score?: string;

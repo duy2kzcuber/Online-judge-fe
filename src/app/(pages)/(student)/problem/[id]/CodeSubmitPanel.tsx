@@ -18,6 +18,7 @@ import {
   resolveResultStyle,
 } from "@/lib/submission/result";
 import Link from "next/link";
+import { getContestPassword } from "@/lib/contest/access";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const MonacoCodeEditor = dynamic(
@@ -38,6 +39,7 @@ interface CodeSubmitPanelProps {
   allowedLanguages?: string[] | null;
   timeLimit?: number;
   memoryLimit?: number;
+  contestId?: number;
 }
 
 export function CodeSubmitPanel({
@@ -45,6 +47,7 @@ export function CodeSubmitPanel({
   allowedLanguages,
   timeLimit,
   memoryLimit,
+  contestId,
 }: CodeSubmitPanelProps) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const languages = useMemo(
@@ -93,10 +96,16 @@ export function CodeSubmitPanel({
     setApiMessage(null);
 
     try {
+      const contestPassword =
+        contestId != null ? getContestPassword(contestId) ?? undefined : undefined;
+
       const { submission, message } = await createSubmission({
         problemId,
         language,
         solution: code,
+        ...(contestId != null
+          ? { contestId, contestPassword }
+          : {}),
       });
       setResult(submission);
       setApiMessage(message ?? null);
@@ -105,7 +114,7 @@ export function CodeSubmitPanel({
     } finally {
       setSubmitting(false);
     }
-  }, [code, language, problemId]);
+  }, [code, contestId, language, problemId]);
 
   if (authLoading) {
     return (
@@ -143,7 +152,12 @@ export function CodeSubmitPanel({
     <div className="flex flex-col h-full min-h-[480px] rounded-[8px] border border-[#DEDEDE] bg-oj-white overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
       <div className="flex flex-wrap items-center justify-between gap-[12px] px-[16px] py-[12px] border-b border-[#DEDEDE] bg-[#FAFAFA]">
         <h2 className="text-[16px] font-[600] text-black">Nộp bài</h2>
-        <div>
+        <div className="flex flex-wrap items-center gap-[8px]">
+          {contestId != null && (
+            <span className="text-[12px] text-oj-orange bg-[#FFF5EE] px-[8px] py-[2px] rounded-[4px]">
+              Kì thi #{contestId}
+            </span>
+          )}
           {timeLimit != null && (
             <span className="text-[12px] text-gray-500">Time: {timeLimit} ms</span>
           )}

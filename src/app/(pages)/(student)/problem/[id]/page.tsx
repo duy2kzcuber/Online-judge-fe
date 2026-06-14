@@ -4,13 +4,20 @@ import { fetchProblemById } from "@/lib/api/problem-api";
 import type { Problem } from "@/lib/api/problem-types";
 import { getDifficultyLabel } from "@/lib/problem/difficulty";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { CodeSubmitPanel } from "./CodeSubmitPanel";
 
 export default function ProblemDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = params.id as string;
+  const contestId = useMemo(() => {
+    const raw = searchParams.get("contestId");
+    if (!raw) return undefined;
+    const parsed = Number(raw);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+  }, [searchParams]);
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,10 +35,12 @@ export default function ProblemDetailPage() {
   return (
     <div className="container pt-[100px] pb-[40px]">
       <Link
-        href="/problem"
+        href={contestId != null ? `/ki-thi/${contestId}` : "/problem"}
         className="text-[14px] text-oj-orange hover:underline mb-[16px] inline-block"
       >
-        ← Quay lại danh sách
+        {contestId != null
+          ? "← Quay lại kì thi"
+          : "← Quay lại danh sách"}
       </Link>
 
       {loading && (
@@ -96,6 +105,7 @@ export default function ProblemDetailPage() {
             allowedLanguages={problem.allowedLanguage}
             timeLimit={problem.timeLimit}
             memoryLimit={problem.memoryLimit}
+            contestId={contestId}
           />
         </div>
       )}

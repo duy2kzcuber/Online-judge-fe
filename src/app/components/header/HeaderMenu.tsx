@@ -16,13 +16,20 @@ export const HeaderMenu = () => {
   ];
 
   const pathName = usePathname();
-  console.log(pathName);
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathName === "/";
+    return pathName === href || pathName.startsWith(`${href}/`);
+  };
 
   return (
     <>
       <ul className="flex flex-wrap flex-1 justify-center">
         {navLinks.map((link) => (
-          <li key={link.id} className={`hover:border-b-[2px] hover:border-b-oj-orange hover:text-oj-orange ${pathName == link.href ? `text-oj-orange border-b-[2px] border-b-oj-orange` : ''}`}>
+          <li
+            key={link.id}
+            className={`hover:border-b-[2px] hover:border-b-oj-orange hover:text-oj-orange ${isActive(link.href) ? "text-oj-orange border-b-[2px] border-b-oj-orange" : ""}`}
+          >
             <Link
               href={link.href}
               className={`flex items-center gap-[5px] px-[20px] py-[20px] md:gap-[10px] text-[12px] md:text-[16px]`}>

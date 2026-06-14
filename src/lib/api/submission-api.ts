@@ -36,3 +36,40 @@ export async function createSubmission(
     message: body.message,
   };
 }
+
+export async function fetchContestSubmissions(
+  contestId: number,
+  problemIds: string[],
+): Promise<Submission[]> {
+  const token = getAccessToken();
+  if (!token) {
+    return [];
+  }
+
+  const params = new URLSearchParams();
+  for (const problemId of problemIds) {
+    if (problemId.trim()) {
+      params.append("problemIds", problemId.trim());
+    }
+  }
+
+  const query = params.toString();
+  const path = query
+    ? `${API_BASE_URL}/submissions/contest/${contestId}?${query}`
+    : `${API_BASE_URL}/submissions/contest/${contestId}`;
+
+  const response = await fetch(path, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  const body: BaseAPIResponse<Submission[]> = await response.json();
+
+  if (!response.ok || body.code !== API_SUCCESS_CODE || !body.data) {
+    throw new Error(body.message ?? "Không thể tải bài nộp trong kì thi");
+  }
+
+  return body.data;
+}
