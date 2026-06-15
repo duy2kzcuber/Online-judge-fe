@@ -63,6 +63,8 @@ export function parseAuthUserFromToken(token: string): AuthUser {
   return {
     userId: payload.userId,
     username: payload.sub,
+    fullName: "",
+    email: "",
     scope: payload.scope ?? "",
     roles,
     permissions,

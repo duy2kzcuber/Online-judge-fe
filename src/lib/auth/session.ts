@@ -1,7 +1,7 @@
 import { API_BASE_URL, API_SUCCESS_CODE } from "./constants";
 import { isTokenExpired, parseAuthUserFromToken } from "./jwt";
 import { setAccessToken, clearAccessToken, getAccessToken } from "./token";
-import { clearStoredUser, setStoredUser } from "./user-storage";
+import { clearStoredUser, getStoredUser, setStoredUser } from "./user-storage";
 import type { BaseAPIResponse } from "@/lib/api/types";
 
 interface UserMyInfo {
@@ -31,12 +31,12 @@ export async function persistSessionFromToken(token: string) {
     const userInfoData: BaseAPIResponse<UserMyInfo> = await response.json();
 
     if (userInfoData.code === API_SUCCESS_CODE && userInfoData.data) {
+      user.fullName = userInfoData.data.fullName ?? user.fullName;
       user.avatar = userInfoData.data.avatarUrl ?? userInfoData.data.avatar ?? user.avatar;
     }
     if (userInfoData.code === API_SUCCESS_CODE) {
       user.email = userInfoData.data?.email ?? user.email;
     }
-    console.log(user);
   } catch (error) {
 
     if (process.env.NODE_ENV === "development") {
@@ -62,7 +62,19 @@ export function restoreSessionFromStorage() {
   }
 
   try {
-    return parseAuthUserFromToken(token);
+    const fromToken = parseAuthUserFromToken(token);
+    const stored = getStoredUser();
+
+    if (stored && stored.userId === fromToken.userId) {
+      return {
+        ...fromToken,
+        fullName: stored.fullName ?? fromToken.fullName,
+        email: stored.email ?? fromToken.email,
+        avatar: stored.avatar ?? fromToken.avatar,
+      };
+    }
+
+    return fromToken;
   } catch {
     clearSession();
     return null;

@@ -2,6 +2,7 @@
 
 import { loginRequest } from "@/lib/auth/auth-api";
 import { clearSession, persistSessionFromToken, restoreSessionFromStorage } from "@/lib/auth/session";
+import { getAccessToken } from "@/lib/auth/token";
 import type { AuthUser, LoginCredentials } from "@/lib/api/types";
 import {
   createContext,
@@ -30,10 +31,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const restoredUser = restoreSessionFromStorage();
-    setUser(restoredUser);
-    setIsAuthenticated(!!restoredUser);
-    setIsLoading(false);
+    const restore = async () => {
+      let restoredUser = restoreSessionFromStorage();
+      setUser(restoredUser);
+      setIsAuthenticated(!!restoredUser);
+
+      if (restoredUser && !restoredUser.fullName?.trim()) {
+        const token = getAccessToken();
+        if (token) {
+          try {
+            restoredUser = await persistSessionFromToken(token);
+            setUser(restoredUser);
+          } catch {
+            // Giữ phiên từ token nếu không tải được my-info
+          }
+        }
+      }
+
+      setIsLoading(false);
+    };
+
+    void restore();
   }, []);
 
   const login = useCallback(async (credentials: LoginCredentials) => {

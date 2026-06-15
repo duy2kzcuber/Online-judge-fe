@@ -46,7 +46,8 @@ export const HeaderAccount = () => {
     );
   }
 
-  const displayName = user?.username ?? "Tài khoản";
+  const displayName =
+    user?.fullName?.trim() || user?.username || "Tài khoản";
   const adminHref = getFirstAccessibleAdminPath(user);
   const showAdminLink = canAccessAnyAdminRoute(user);
   return (
@@ -68,7 +69,7 @@ export const HeaderAccount = () => {
               {displayName.charAt(0)}
             </span>
           )}
-          <span className="hidden md:inline max-w-[120px] truncate font-[500]">
+          <span className="inline max-w-[100px] sm:max-w-[120px] truncate font-[500] text-[12px] md:text-[14px]">
             {displayName}
           </span>
           <FiChevronDown className="shrink-0 text-[16px]" />
