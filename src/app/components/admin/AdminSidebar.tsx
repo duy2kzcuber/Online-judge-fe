@@ -13,12 +13,13 @@ const generalChildren = [
   { href: "/admin/users", label: "Quản lý Người dùng" },
   { href: "/admin/roles", label: "Quản lý vai trò & quyền" },
   { href: "/admin/announcement", label: "Quản lý bài viết" },
+  { href: "/admin/submissions", label: "Quản lý bài nộp" },
+  { href: "/admin/categories", label: "Quản lý danh mục" },
 ];
 
 const problemChildren = [
   { href: "/admin/problems", label: "Danh sách bài tập" },
   { href: "/admin/problems/create", label: "Tạo bài tập" },
-  { href: "/admin/categories", label: "Quản lý danh mục" },
 ];
 
 const contestChildren = [
@@ -54,12 +55,12 @@ export const AdminSidebar = ({ isOpen }: { isOpen: boolean }) => {
     pathname.startsWith("/admin/users") ||
     pathname.startsWith("/admin/roles") ||
     pathname.startsWith("/admin/announcement") ||
+    pathname.startsWith("/admin/submissions") ||
+    pathname.startsWith("/admin/categories") ||
     pathname.startsWith("/admin/conf") ||
     pathname.startsWith("/admin/judge-server") ||
     pathname.startsWith("/admin/prune-test-case");
-  const isProblemSection =
-    pathname.startsWith("/admin/problems") ||
-    pathname.startsWith("/admin/categories");
+  const isProblemSection = pathname.startsWith("/admin/problems");
   const isContestSection = pathname.startsWith("/admin/contest");
   const [generalOpen, setGeneralOpen] = useState(isGeneralSection);
   const [problemOpen, setProblemOpen] = useState(isProblemSection);

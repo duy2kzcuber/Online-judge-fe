@@ -44,6 +44,10 @@ const ADMIN_ROUTE_RULES: AdminRouteRule[] = [
     ],
   },
   {
+    match: (pathname) => pathname.startsWith("/admin/submissions"),
+    permissions: ["VIEW_PROBLEM", "DELETE_PROBLEM"],
+  },
+  {
     match: (pathname) => pathname.startsWith("/admin/contest"),
     permissions: ["VIEW_CONTEST", "CREATE_CONTEST", "DELETE_CONTEST"],
   },
@@ -104,6 +108,7 @@ const ADMIN_NAV_PATHS = [
   "/admin/roles",
   "/admin/announcement",
   "/admin/problems",
+  "/admin/submissions",
   "/admin/categories",
   "/admin/contest",
 ] as const;

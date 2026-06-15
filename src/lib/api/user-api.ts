@@ -3,6 +3,7 @@ import type {
   User,
   UserCreatePayload,
   UserPage,
+  UserPersonalSettingsPayload,
   UserUpdatePayload,
   UserUpdateResult,
 } from "@/lib/api/user-types";
@@ -70,6 +71,21 @@ export async function createUser(payload: UserCreatePayload): Promise<User> {
   return body.data;
 }
 
+function buildPersonalSettingsFormData(
+  request: UserPersonalSettingsPayload,
+  avatar?: File | null,
+): FormData {
+  const formData = new FormData();
+  formData.append(
+    "request",
+    new Blob([JSON.stringify(request)], { type: "application/json" }),
+  );
+  if (avatar) {
+    formData.append("avatar", avatar);
+  }
+  return formData;
+}
+
 function buildUserUpdateFormData(
   request: UserUpdatePayload,
   avatar?: File | null,
@@ -83,6 +99,30 @@ function buildUserUpdateFormData(
     formData.append("avatar", avatar);
   }
   return formData;
+}
+
+export async function fetchMyInfo(): Promise<User> {
+  const body = await apiFetch<User>("/users/my-info");
+  if (body.code !== API_SUCCESS_CODE || !body.data) {
+    throw new Error(body.message ?? "Không thể tải thông tin cá nhân");
+  }
+  return body.data;
+}
+
+export async function updatePersonalSettings(
+  payload: UserPersonalSettingsPayload,
+  avatar?: File | null,
+): Promise<UserUpdateResult> {
+  const response = await fetch(`${API_BASE_URL}/users/me/settings`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: buildPersonalSettingsFormData(payload, avatar),
+  });
+  const body = (await response.json()) as BaseAPIResponse<User>;
+  if (!response.ok || body.code !== API_SUCCESS_CODE || !body.data) {
+    throw new Error(body.message ?? "Không thể cập nhật cài đặt cá nhân");
+  }
+  return { user: body.data, token: body.token };
 }
 
 export async function updateUser(

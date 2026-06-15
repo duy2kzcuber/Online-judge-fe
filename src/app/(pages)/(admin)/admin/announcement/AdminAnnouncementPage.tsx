@@ -11,6 +11,7 @@ import {
   updateAnnouncement,
 } from "@/lib/api/announcement-api";
 import type { Announcement } from "@/lib/api/announcement-types";
+import { getSpringPageMeta } from "@/lib/api/problem-types";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
@@ -81,11 +82,12 @@ function AdminAnnouncementPageContent() {
         if (cancelled) return;
 
         setAnnouncements(data.content ?? []);
+        const pageMeta = getSpringPageMeta(data);
         setPagination({
           page,
-          pageSize: data.size ?? PAGE_SIZE,
-          totalPages: Math.max(1, data.totalPages ?? 1),
-          totalItems: data.totalElements ?? 0,
+          pageSize: pageMeta.size,
+          totalPages: pageMeta.totalPages,
+          totalItems: pageMeta.totalElements,
         });
       } catch (err) {
         if (!cancelled) {
@@ -116,11 +118,12 @@ function AdminAnnouncementPageContent() {
   const reloadList = async () => {
     const data = await fetchAnnouncements(page - 1, PAGE_SIZE);
     setAnnouncements(data.content ?? []);
+    const pageMeta = getSpringPageMeta(data);
     setPagination({
       page,
-      pageSize: data.size ?? PAGE_SIZE,
-      totalPages: Math.max(1, data.totalPages ?? 1),
-      totalItems: data.totalElements ?? 0,
+      pageSize: pageMeta.size,
+      totalPages: pageMeta.totalPages,
+      totalItems: pageMeta.totalElements,
     });
   };
 

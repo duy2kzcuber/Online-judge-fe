@@ -12,6 +12,7 @@ import {
   updateUser,
 } from "@/lib/api/user-api";
 import type { Role, User } from "@/lib/api/user-types";
+import { getSpringPageMeta } from "@/lib/api/problem-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -164,11 +165,12 @@ function AdminUsersPageContent() {
         if (cancelled) return;
 
         setUsers(data.content ?? []);
+        const pageMeta = getSpringPageMeta(data);
         setPagination({
           page,
-          pageSize: data.size ?? PAGE_SIZE,
-          totalPages: Math.max(1, data.totalPages ?? 1),
-          totalItems: data.totalElements ?? 0,
+          pageSize: pageMeta.size,
+          totalPages: pageMeta.totalPages,
+          totalItems: pageMeta.totalElements,
         });
       } catch (err) {
         if (!cancelled) {
@@ -210,11 +212,12 @@ function AdminUsersPageContent() {
   const reloadList = async () => {
     const data = await fetchUsers(page - 1, PAGE_SIZE);
     setUsers(data.content ?? []);
+    const pageMeta = getSpringPageMeta(data);
     setPagination({
       page,
-      pageSize: data.size ?? PAGE_SIZE,
-      totalPages: Math.max(1, data.totalPages ?? 1),
-      totalItems: data.totalElements ?? 0,
+      pageSize: pageMeta.size,
+      totalPages: pageMeta.totalPages,
+      totalItems: pageMeta.totalElements,
     });
   };
 

@@ -46,6 +46,9 @@ function buildProblemQuery(params: ProblemListParams): string {
   if (params.difficulty && params.difficulty > 0) {
     qs.set("difficulty", String(params.difficulty));
   }
+  if (params.isPublic != null) {
+    qs.set("isPublic", String(params.isPublic));
+  }
   qs.set("page", String(params.page ?? 0));
   qs.set("size", String(params.size ?? 10));
   qs.set("sort", "createdAt,desc");

@@ -40,6 +40,12 @@ export const AdminTopbar = ({
       <div className="flex items-center gap-[16px]">
         <span className="text-[14px] text-[#6B7280]">{displayEmail}</span>
         <Link
+          href="/account"
+          className="text-[14px] text-[#374151] hover:text-oj-orange transition-colors"
+        >
+          Thông tin cá nhân
+        </Link>
+        <Link
           href="/"
           className="text-[14px] text-[#374151] hover:text-oj-orange transition-colors"
         >

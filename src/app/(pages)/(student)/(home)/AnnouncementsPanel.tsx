@@ -7,6 +7,7 @@ import {
 } from "@/app/components/Pagination/Pagination";
 import { fetchPublicAnnouncements } from "@/lib/api/announcement-api";
 import type { Announcement } from "@/lib/api/announcement-types";
+import { getSpringPageMeta } from "@/lib/api/problem-types";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -62,11 +63,12 @@ export function AnnouncementsPanel() {
         if (cancelled) return;
 
         setAnnouncements(data.content ?? []);
+        const pageMeta = getSpringPageMeta(data);
         setPagination({
           page,
-          pageSize: data.size ?? PAGE_SIZE,
-          totalPages: Math.max(1, data.totalPages ?? 1),
-          totalItems: data.totalElements ?? 0,
+          pageSize: pageMeta.size,
+          totalPages: pageMeta.totalPages,
+          totalItems: pageMeta.totalElements,
         });
       } catch (err) {
         if (!cancelled) {

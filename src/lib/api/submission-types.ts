@@ -12,6 +12,7 @@ export interface SubmissionRequest {
 export interface Submission {
   id: string;
   problemId: string;
+  problemTitle?: string | null;
   contestId?: number | null;
   language: string;
   solution?: string;
@@ -22,4 +23,6 @@ export interface Submission {
   judgeMessage?: string;
   createdAt?: string;
   createdBy?: string;
+  submitterUsername?: string | null;
+  submitterFullName?: string | null;
 }

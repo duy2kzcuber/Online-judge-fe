@@ -90,8 +90,13 @@ export const HeaderAccount = () => {
             </Link>
           </li>
           <li role="none">
-            <Link href="#" className={menuLinkClass} role="menuitem">
+            <Link href="/submissions" className={menuLinkClass} role="menuitem">
               Các bài tập đã nộp
+            </Link>
+          </li>
+          <li role="none">
+            <Link href="/account" className={menuLinkClass} role="menuitem">
+              Thông tin cá nhân
             </Link>
           </li>
           {showAdminLink && adminHref && (

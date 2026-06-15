@@ -5,7 +5,7 @@ import {
   type PaginationData,
 } from "@/app/components/Pagination/Pagination";
 import { fetchProblems } from "@/lib/api/problem-api";
-import type { Category, Problem } from "@/lib/api/problem-types";
+import { getSpringPageMeta, type Category, type Problem } from "@/lib/api/problem-types";
 import { getDifficultyLabel } from "@/lib/problem/difficulty";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -61,11 +61,12 @@ export function ProblemList({
         if (cancelled) return;
 
         setProblems(data.content ?? []);
+        const pageMeta = getSpringPageMeta(data);
         setPagination({
           page,
-          pageSize: data.size ?? PAGE_SIZE,
-          totalPages: Math.max(1, data.totalPages ?? 1),
-          totalItems: data.totalElements ?? 0,
+          pageSize: pageMeta.size,
+          totalPages: pageMeta.totalPages,
+          totalItems: pageMeta.totalElements,
         });
       } catch (err) {
         if (!cancelled) {

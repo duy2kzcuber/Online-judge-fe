@@ -1,7 +1,7 @@
 "use client";
 
 import { deleteProblem, fetchProblems } from "@/lib/api/problem-api";
-import type { Category, Problem } from "@/lib/api/problem-types";
+import { getSpringPageMeta, type Category, type Problem } from "@/lib/api/problem-types";
 import { getDifficultyLabel } from "@/lib/problem/difficulty";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -151,11 +151,12 @@ export function AdminProblemList({
         size: PAGE_SIZE,
       });
       setProblems(data.content ?? []);
+      const pageMeta = getSpringPageMeta(data);
       setPagination({
         page,
-        pageSize: data.size ?? PAGE_SIZE,
-        totalPages: Math.max(1, data.totalPages ?? 1),
-        totalItems: data.totalElements ?? 0,
+        pageSize: pageMeta.size,
+        totalPages: pageMeta.totalPages,
+        totalItems: pageMeta.totalElements,
       });
     } catch (err) {
       setError(

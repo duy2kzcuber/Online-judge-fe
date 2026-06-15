@@ -6,6 +6,7 @@ import {
 } from "@/app/components/Pagination/Pagination";
 import { deleteContest, fetchContests } from "@/lib/api/contest-api";
 import type { Contest } from "@/lib/api/contest-types";
+import { getSpringPageMeta } from "@/lib/api/problem-types";
 import {
   getContestStatus,
   getContestStatusClass,
@@ -70,11 +71,12 @@ export function AdminContestList({
     try {
       const data = await fetchContests(page - 1, PAGE_SIZE);
       setContests(data.content ?? []);
+      const pageMeta = getSpringPageMeta(data);
       setPagination({
         page,
-        pageSize: data.size ?? PAGE_SIZE,
-        totalPages: Math.max(1, data.totalPages ?? 1),
-        totalItems: data.totalElements ?? 0,
+        pageSize: pageMeta.size,
+        totalPages: pageMeta.totalPages,
+        totalItems: pageMeta.totalElements,
       });
     } catch (err) {
       setError(

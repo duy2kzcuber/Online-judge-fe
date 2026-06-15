@@ -33,6 +33,17 @@ export interface UserUpdatePayload {
   roleIds?: number[];
 }
 
+export interface UserPersonalSettingsPayload {
+  password?: string;
+  bio?: string;
+}
+
+export function resolveUserAvatarUrl(
+  user?: Pick<User, "avatar" | "avatarUrl"> | null,
+): string {
+  return user?.avatarUrl?.trim() || user?.avatar?.trim() || "";
+}
+
 export type UserPage = SpringPage<User>;
 
 export interface UserUpdateResult {
