@@ -11,22 +11,44 @@ const ADMIN_FALLBACK_ROLE = "admin";
 const ADMIN_ROUTE_RULES: AdminRouteRule[] = [
   {
     match: (pathname) => pathname === "/admin",
-    permissions: ["CREATE_USER", "CREATE_POST", "UPDATE_POST", "DELETE_POST"],
+    permissions: [
+      "VIEW_USER",
+      "CREATE_USER",
+      "VIEW_PROBLEM",
+      "CREATE_PROBLEM",
+      "VIEW_CONTEST",
+      "CREATE_CONTEST",
+      "CREATE_POST",
+      "CREATE_CTG",
+    ],
   },
   {
     match: (pathname) => pathname.startsWith("/admin/users"),
-    permissions: ["CREATE_USER"],
+    permissions: ["VIEW_USER", "CREATE_USER", "UPDATE_USER", "DELETE_USER"],
   },
   {
-    match: (pathname) =>
-      pathname.startsWith("/admin/announcement") ||
-      pathname.startsWith("/admin/categories"),
+    match: (pathname) => pathname.startsWith("/admin/announcement"),
     permissions: ["CREATE_POST", "UPDATE_POST", "DELETE_POST"],
   },
   {
+    match: (pathname) => pathname.startsWith("/admin/categories"),
+    permissions: ["CREATE_CTG", "UPDATE_CTG", "DELETE_CTG"],
+  },
+  {
+    match: (pathname) => pathname.startsWith("/admin/problems"),
+    permissions: [
+      "VIEW_PROBLEM",
+      "CREATE_PROBLEM",
+      "UPDATE_PROBLEM",
+      "DELETE_PROBLEM",
+    ],
+  },
+  {
+    match: (pathname) => pathname.startsWith("/admin/contest"),
+    permissions: ["VIEW_CONTEST", "CREATE_CONTEST", "DELETE_CONTEST"],
+  },
+  {
     match: (pathname) =>
-      pathname.startsWith("/admin/problems") ||
-      pathname.startsWith("/admin/contest") ||
       pathname.startsWith("/admin/roles") ||
       pathname.startsWith("/admin/conf") ||
       pathname.startsWith("/admin/judge-server") ||

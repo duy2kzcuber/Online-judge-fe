@@ -4,7 +4,7 @@ import {
   Pagination,
   type PaginationData,
 } from "@/app/components/Pagination/Pagination";
-import { fetchContests } from "@/lib/api/contest-api";
+import { deleteContest, fetchContests } from "@/lib/api/contest-api";
 import type { Contest } from "@/lib/api/contest-types";
 import {
   getContestStatus,
@@ -13,7 +13,7 @@ import {
   type ContestStatus,
 } from "@/lib/contest/status";
 import Link from "next/link";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 
 const PAGE_SIZE = 10;
@@ -60,50 +60,63 @@ export function AdminContestList({
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    const load = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchContests(page - 1, PAGE_SIZE);
-        if (cancelled) return;
-
-        setContests(data.content ?? []);
-        setPagination({
-          page,
-          pageSize: data.size ?? PAGE_SIZE,
-          totalPages: Math.max(1, data.totalPages ?? 1),
-          totalItems: data.totalElements ?? 0,
-        });
-      } catch (err) {
-        if (!cancelled) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : "Không thể tải danh sách kì thi",
-          );
-          setContests([]);
-          setPagination({
-            page: 1,
-            pageSize: PAGE_SIZE,
-            totalPages: 1,
-            totalItems: 0,
-          });
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    load();
-    return () => {
-      cancelled = true;
-    };
+  const loadContests = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchContests(page - 1, PAGE_SIZE);
+      setContests(data.content ?? []);
+      setPagination({
+        page,
+        pageSize: data.size ?? PAGE_SIZE,
+        totalPages: Math.max(1, data.totalPages ?? 1),
+        totalItems: data.totalElements ?? 0,
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Không thể tải danh sách kì thi",
+      );
+      setContests([]);
+      setPagination({
+        page: 1,
+        pageSize: PAGE_SIZE,
+        totalPages: 1,
+        totalItems: 0,
+      });
+    } finally {
+      setLoading(false);
+    }
   }, [page]);
+
+  useEffect(() => {
+    void loadContests();
+  }, [loadContests]);
+
+  const handleDelete = async (contest: Contest) => {
+    const confirmed = window.confirm(
+      `Bạn có chắc muốn xóa kì thi "${contest.title}"?\n\nChỉ có thể xóa kì thi chưa bắt đầu. Hành động này không thể hoàn tác.`,
+    );
+    if (!confirmed) return;
+
+    setSuccessMessage(null);
+    setDeletingId(contest.id);
+    try {
+      const message = await deleteContest(contest.id);
+      setSuccessMessage(message ?? "Xóa kì thi thành công!");
+      if (expandedId === contest.id) {
+        setExpandedId(null);
+      }
+      await loadContests();
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : "Không thể xóa kì thi");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const filteredContests = useMemo(() => {
     const q = keyword.trim().toLowerCase();
@@ -164,6 +177,15 @@ export function AdminContestList({
 
   return (
     <>
+      {successMessage && (
+        <div
+          className="mb-[16px] rounded-[8px] border border-[#A7F3D0] bg-[#ECFDF5] px-[16px] py-[12px] text-[14px] text-[#047857]"
+          role="status"
+        >
+          {successMessage}
+        </div>
+      )}
+
       <div className="overflow-auto">
         <table className="w-full border-collapse text-[14px]">
           <thead>
@@ -178,7 +200,7 @@ export function AdminContestList({
               <th className="py-[12px] px-[8px]">Mật khẩu</th>
               <th className="py-[12px] px-[8px]">Hiển thị</th>
               <th className="py-[12px] px-[8px]">Người tạo</th>
-              <th className="py-[12px] px-[8px] w-[100px] text-right">
+              <th className="py-[12px] px-[8px] w-[180px] text-right">
                 Thao tác
               </th>
             </tr>
@@ -248,11 +270,11 @@ export function AdminContestList({
                     <td className="py-[12px] px-[8px]">
                       <div className="flex justify-end gap-[8px]">
                         <Link
-                          href={`/admin/contest/${contest.id}/participants`}
+                          href={`/admin/contest/${contest.id}/view`}
                           onClick={(e) => e.stopPropagation()}
                           className="border border-[#D1D5DB] rounded-[6px] px-[8px] py-[5px] text-[13px] hover:border-oj-orange hover:text-oj-orange"
                         >
-                          Thí sinh
+                          Xem
                         </Link>
                         <Link
                           href={`/admin/contest/${contest.id}/edit`}
@@ -261,6 +283,17 @@ export function AdminContestList({
                         >
                           Sửa
                         </Link>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            void handleDelete(contest);
+                          }}
+                          disabled={deletingId === contest.id}
+                          className="border border-[#FCA5A5] rounded-[6px] px-[8px] py-[5px] text-[13px] text-[#DC2626] hover:bg-[#FEF2F2] disabled:opacity-60"
+                        >
+                          {deletingId === contest.id ? "Đang xóa..." : "Xóa"}
+                        </button>
                       </div>
                     </td>
                   </tr>

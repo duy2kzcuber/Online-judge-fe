@@ -235,3 +235,15 @@ export async function updateContest(
 
   return response.data;
 }
+
+export async function deleteContest(contestId: number): Promise<string | undefined> {
+  const response = await apiFetch<unknown>(`/contests/${contestId}`, {
+    method: "DELETE",
+  });
+
+  if (response.code !== API_SUCCESS_CODE) {
+    throw new Error(response.message ?? "Không thể xóa kì thi");
+  }
+
+  return response.message;
+}
