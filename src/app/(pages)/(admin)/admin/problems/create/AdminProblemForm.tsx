@@ -8,7 +8,7 @@ import {
 } from "@/lib/api/problem-api";
 import type { Category, ProblemRequestPayload } from "@/lib/api/problem-types";
 import { DIFFICULTY_OPTIONS } from "@/lib/problem/difficulty";
-import { DEFAULT_LANGUAGES } from "@/lib/submission/language";
+import { DEFAULT_LANGUAGES, PROBLEM_SUBMISSION_LANGUAGES } from "@/lib/submission/language";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useState } from "react";
@@ -32,6 +32,24 @@ const defaultForm: ProblemRequestPayload = {
   categories: [],
   difficulty: 1,
 };
+
+type ProblemLanguage = (typeof PROBLEM_SUBMISSION_LANGUAGES)[number];
+
+function normalizeAllowedLanguages(langs?: string[] | null): ProblemLanguage[] {
+  const seen = new Set<ProblemLanguage>();
+  const result: ProblemLanguage[] = [];
+
+  for (const lang of langs ?? []) {
+    const key = lang.trim().toLowerCase();
+    const canonical: ProblemLanguage | null =
+      key === "c" ? "c" : key === "cpp" || key === "c++" ? "cpp" : null;
+    if (!canonical || seen.has(canonical)) continue;
+    seen.add(canonical);
+    result.push(canonical);
+  }
+
+  return result;
+}
 
 function AdminProblemFormContent() {
   const router = useRouter();
@@ -73,8 +91,8 @@ function AdminProblemFormContent() {
           timeLimit: problem.timeLimit ?? 1000,
           memoryLimit: problem.memoryLimit ?? 256,
           allowedLanguage:
-            problem.allowedLanguage?.length
-              ? problem.allowedLanguage
+            normalizeAllowedLanguages(problem.allowedLanguage).length > 0
+              ? normalizeAllowedLanguages(problem.allowedLanguage)
               : [...DEFAULT_LANGUAGES],
           categories: problem.categories ?? [],
           difficulty: problem.difficulty ?? 1,
@@ -109,16 +127,40 @@ function AdminProblemFormContent() {
     });
   };
 
+  const toggleAllowedLanguage = (lang: ProblemLanguage, checked: boolean) => {
+    setForm((prev) => {
+      const current = normalizeAllowedLanguages(prev.allowedLanguage);
+      const next = checked
+        ? [...current, lang]
+        : current.filter((item) => item !== lang);
+      return {
+        ...prev,
+        allowedLanguage: [...new Set(next)],
+      };
+    });
+  };
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+
+    if (normalizeAllowedLanguages(form.allowedLanguage).length === 0) {
+      setError("Vui lòng chọn ít nhất một ngôn ngữ (C hoặc C++)");
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
     try {
+      const payload: ProblemRequestPayload = {
+        ...form,
+        allowedLanguage: normalizeAllowedLanguages(form.allowedLanguage),
+      };
+
       if (isEdit && editId) {
-        await updateProblem(editId, form, testCaseFile);
+        await updateProblem(editId, payload, testCaseFile);
       } else {
-        await createProblem(form, testCaseFile);
+        await createProblem(payload, testCaseFile);
       }
       router.push("/admin/problems");
       router.refresh();
@@ -299,6 +341,30 @@ function AdminProblemFormContent() {
           </div>
         </div>
 
+        <div>
+          <p className="mb-[6px] text-[14px]">Ngôn ngữ được phép nộp bài *</p>
+          <div className="flex flex-wrap gap-[20px]">
+            <label className="flex items-center gap-[8px] text-[14px] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={normalizeAllowedLanguages(form.allowedLanguage).includes("c")}
+                onChange={(e) => toggleAllowedLanguage("c", e.target.checked)}
+              />
+              C
+            </label>
+            <label className="flex items-center gap-[8px] text-[14px] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={normalizeAllowedLanguages(form.allowedLanguage).includes(
+                  "cpp",
+                )}
+                onChange={(e) => toggleAllowedLanguage("cpp", e.target.checked)}
+              />
+              C++
+            </label>
+          </div>
+        </div>
+
         <div className="flex flex-wrap gap-[20px]">
           <label className="flex items-center gap-[8px] text-[14px] cursor-pointer">
             <input
@@ -310,7 +376,7 @@ function AdminProblemFormContent() {
             />
             Công khai
           </label>
-          <label className="flex items-center gap-[8px] text-[14px] cursor-pointer">
+          <label className="flex items-center gap-[8px] text-[14px] cursor-pointer hidden">
             <input
               type="checkbox"
               checked={form.isShareSubmission}
@@ -319,19 +385,6 @@ function AdminProblemFormContent() {
               }
             />
             Cho phép xem bài nộp của người khác
-          </label>
-          <label className="flex items-center gap-[8px] text-[14px] cursor-pointer">
-            <input
-              type="checkbox"
-              checked={(form.allowedLanguage ?? []).includes("cpp")}
-              onChange={(e) =>
-                setForm((p) => ({
-                  ...p,
-                  allowedLanguage: e.target.checked ? ["cpp"] : [],
-                }))
-              }
-            />
-            C++
           </label>
         </div>
 

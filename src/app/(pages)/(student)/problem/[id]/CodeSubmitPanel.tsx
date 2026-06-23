@@ -8,7 +8,7 @@ import {
   getCodeTemplate,
   getLanguageLabel,
   getSourceFileName,
-  normalizeLanguages,
+  normalizeSubmissionLanguages,
 } from "@/lib/submission/language";
 import dynamic from "next/dynamic";
 import {
@@ -51,7 +51,7 @@ export function CodeSubmitPanel({
 }: CodeSubmitPanelProps) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const languages = useMemo(
-    () => normalizeLanguages(allowedLanguages),
+    () => normalizeSubmissionLanguages(allowedLanguages),
     [allowedLanguages],
   );
 
@@ -159,11 +159,11 @@ export function CodeSubmitPanel({
             </span>
           )}
           {timeLimit != null && (
-            <span className="text-[12px] text-gray-500">Time: {timeLimit} ms</span>
+            <span className="text-[12px] text-gray-500">Giới hạn thời gian: {timeLimit} ms</span>
           )}
           {memoryLimit != null && (
             <span className="text-[12px] text-gray-500 ml-[8px]">
-              Memory: {memoryLimit} MB
+              Giới hạn bộ nhớ: {memoryLimit} MB
             </span>
           )}
         </div>
